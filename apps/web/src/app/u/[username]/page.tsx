@@ -13,6 +13,7 @@ import { ReportModal } from "@/components/ReportModal";
 import { LoadingState } from "@/components/Spinner";
 import { api, type Profile, type UserMe } from "@/lib/api";
 import { useI18n } from "@/lib/i18n";
+import { formatRelativeTime, isOnline } from "@/lib/time";
 
 type Tab = "posts" | "replies" | "media";
 
@@ -194,6 +195,16 @@ export default function ProfilePage() {
               )}
               <span>
                 {dict.profile.joined} {formatJoinedDate(profile.created_at, locale)}
+              </span>
+              <span className="flex items-center gap-1">
+                {isOnline(profile.last_seen_at) ? (
+                  <>
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                    <span className="font-medium text-emerald-600 dark:text-emerald-400">{dict.common.online}</span>
+                  </>
+                ) : (
+                  `${dict.common.lastSeenAt} ${formatRelativeTime(profile.last_seen_at, locale)}`
+                )}
               </span>
             </div>
 
