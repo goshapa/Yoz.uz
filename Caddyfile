@@ -3,6 +3,13 @@ yozapp.uz {
 	# поэтому можно безопасно закрепить HTTPS-only на год (с поддоменами).
 	header Strict-Transport-Security "max-age=31536000; includeSubDomains"
 
+	# Сжатие ответов — без этого JS/CSS/HTML/JSON уходят клиенту полным весом.
+	# zstd эффективнее и быстрее gzip там, где браузер его поддерживает, gzip —
+	# универсальный фолбэк. Картинки (/yoz-media/*) уже сжаты как JPEG/WebP,
+	# повторное сжатие им не нужно, но лишним не будет — Caddy сам не сжимает
+	# то, что и так плотно упаковано (see internal min-length heuristics).
+	encode zstd gzip
+
 	# API — напрямую в контейнер api, в обход Next.js (быстрее и надёжнее для
 	# больших загрузок изображений). Next.js со своей стороны тоже умеет
 	# проксировать /api/* (см. apps/web/next.config.mjs) — это работает
