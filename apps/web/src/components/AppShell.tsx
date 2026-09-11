@@ -62,8 +62,10 @@ export function AppShell({
 
   // Открытая переписка — на мобильном разворачивается на весь экран, без нижней
   // панели (как в большинстве мессенджеров): список диалогов /messages её ещё
-  // показывает, а конкретный чат /messages/username — уже нет.
-  const isConversationView = pathname.startsWith("/messages/");
+  // показывает, а конкретный чат /messages/username или /groups/id — уже нет.
+  // /groups/id/settings сюда не попадает — это обычная прокручиваемая страница,
+  // не полноэкранный чат, ей нижняя панель не мешает.
+  const isConversationView = pathname.startsWith("/messages/") || /^\/groups\/[^/]+$/.test(pathname);
 
   // Чат — по центру нижней панели на мобильном (индекс 2 из 5).
   const navItems: { href: string; label: string; icon: IconName; badge?: number }[] = [
@@ -170,7 +172,7 @@ export function AppShell({
         </nav>
       )}
 
-      {user && !pathname.startsWith("/messages") && (
+      {user && !pathname.startsWith("/messages") && !isConversationView && (
         <button
           type="button"
           onClick={() => setComposerOpen(true)}
