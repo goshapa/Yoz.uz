@@ -187,6 +187,8 @@ const uz: Dictionary = {
   settings: {
     title: "Profil sozlamalari",
     displayName: "Ko‘rinadigan ism",
+    username: "Foydalanuvchi nomi",
+    usernameHint: "3-20 belgi: lotin harflari, raqamlar va pastki chiziqcha",
     bio: "Tavsif",
     bioHint: "Ko‘pi bilan 160 belgi",
     city: "Shahar",

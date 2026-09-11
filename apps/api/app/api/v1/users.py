@@ -15,7 +15,7 @@ from app.models.post_image import PostImage
 from app.models.user import User
 from app.schemas.auth import MessageResponse
 from app.schemas.post import FeedPage, PostAuthor
-from app.schemas.user import DeleteAccountRequest, FollowListPage, ProfileOut, UserMe
+from app.schemas.user import USERNAME_RE, DeleteAccountRequest, FollowListPage, ProfileOut, UserMe
 from app.services.activity_feed import paginate_activity
 from app.services.blocks import get_related_block_ids, is_blocked
 from app.services.images import process_upload
@@ -40,6 +40,7 @@ async def update_current_user(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
     display_name: str | None = Form(default=None),
+    username: str | None = Form(default=None),
     bio: str | None = Form(default=None),
     city: str | None = Form(default=None),
     website: str | None = Form(default=None),
@@ -54,6 +55,21 @@ async def update_current_user(
                 detail=f"Отображаемое имя должно быть от 1 до {DISPLAY_NAME_MAX_LENGTH} символов",
             )
         current_user.display_name = display_name
+
+    if username is not None:
+        username = username.strip()
+        if not USERNAME_RE.match(username):
+            raise HTTPException(
+                status.HTTP_400_BAD_REQUEST,
+                detail="Username: 3-20 символов, латинские буквы, цифры и нижнее подчёркивание",
+            )
+        if username.lower() != current_user.username.lower():
+            existing = await db.execute(
+                select(User).where(func.lower(User.username) == username.lower(), User.id != current_user.id)
+            )
+            if existing.scalar_one_or_none() is not None:
+                raise HTTPException(status.HTTP_409_CONFLICT, detail="Такой username уже существует")
+        current_user.username = username
 
     if bio is not None:
         bio = bio.strip()

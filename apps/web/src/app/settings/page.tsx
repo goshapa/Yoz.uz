@@ -18,6 +18,7 @@ export default function SettingsPage() {
   const [checkedAuth, setCheckedAuth] = useState(false);
 
   const [displayName, setDisplayName] = useState("");
+  const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
   const [city, setCity] = useState("");
   const [website, setWebsite] = useState("");
@@ -46,6 +47,7 @@ export default function SettingsPage() {
       .then((u) => {
         setUser(u);
         setDisplayName(u.display_name);
+        setUsername(u.username);
         setBio(u.bio ?? "");
         setCity(u.city ?? "");
         setWebsite(u.website ?? "");
@@ -61,6 +63,7 @@ export default function SettingsPage() {
 
     const formData = new FormData();
     formData.append("display_name", displayName);
+    formData.append("username", username);
     formData.append("bio", bio);
     formData.append("city", city);
     formData.append("website", website);
@@ -163,6 +166,27 @@ export default function SettingsPage() {
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
               />
+            </div>
+
+            <div>
+              <label className="label" htmlFor="settings-username">
+                {dict.settings.username}
+              </label>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[var(--fg-muted)]">@</span>
+                <input
+                  id="settings-username"
+                  className="input"
+                  minLength={3}
+                  maxLength={20}
+                  pattern="[a-zA-Z0-9_]{3,20}"
+                  title={dict.settings.usernameHint}
+                  required
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value.replace(/\s/g, ""))}
+                />
+              </div>
+              <p className="mt-1 text-xs text-[var(--fg-muted)]">{dict.settings.usernameHint}</p>
             </div>
 
             <div>

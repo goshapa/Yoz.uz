@@ -187,6 +187,8 @@ const en: Dictionary = {
   settings: {
     title: "Profile settings",
     displayName: "Display name",
+    username: "Username",
+    usernameHint: "3-20 characters: letters, digits, and underscore",
     bio: "Bio",
     bioHint: "Up to 160 characters",
     city: "City",
