@@ -125,6 +125,8 @@ const en: Dictionary = {
   },
   messages: {
     title: "Chat",
+    searchPlaceholder: "Find someone to message",
+    searchNoResults: "No one found",
     empty: "No conversations yet. Write to someone first.",
     emptyThread: "No messages yet. Start the conversation.",
     placeholder: "Write a message…",

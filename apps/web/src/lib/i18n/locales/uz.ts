@@ -125,6 +125,8 @@ const uz: Dictionary = {
   },
   messages: {
     title: "Chat",
+    searchPlaceholder: "Kimga yozishni qidirish",
+    searchNoResults: "Hech kim topilmadi",
     empty: "Hozircha yozishmalar yo‘q. Birinchi bo‘lib kimgadir yozing.",
     emptyThread: "Hozircha xabarlar yo‘q. Yozishmani boshlang.",
     placeholder: "Xabar yozish…",

@@ -123,6 +123,8 @@ const ru = {
   },
   messages: {
     title: "Чат",
+    searchPlaceholder: "Найти, кому написать",
+    searchNoResults: "Никого не нашли",
     empty: "Пока нет переписок. Напишите кому-нибудь первым.",
     emptyThread: "Сообщений пока нет. Начните переписку.",
     placeholder: "Написать сообщение…",
