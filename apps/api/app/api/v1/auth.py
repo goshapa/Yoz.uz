@@ -230,6 +230,9 @@ async def login(
     if user.is_suspended:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=_suspended_detail(user))
 
+    if not user.email_verified:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="EMAIL_NOT_VERIFIED")
+
     if user.role != UserRole.user and user.totp_enabled:
         challenge_token = await create_login_challenge(user.id)
         return LoginResult(requires_2fa=True, challenge_token=challenge_token)

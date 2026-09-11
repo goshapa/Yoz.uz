@@ -32,6 +32,10 @@ export default function LoginPage() {
         router.refresh();
       }
     } catch (err) {
+      if (err instanceof ApiError && err.message === "EMAIL_NOT_VERIFIED") {
+        router.push(`/verify-email?email=${encodeURIComponent(email.trim())}`);
+        return;
+      }
       setError(
         err instanceof ApiError && err.status === 401
           ? dict.errors.invalidCredentials
