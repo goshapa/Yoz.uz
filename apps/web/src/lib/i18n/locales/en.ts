@@ -59,6 +59,7 @@ const en: Dictionary = {
     emptyFollowing: "Nothing here yet. Find people to follow.",
     emptyOverview: "No posts yet.",
     findUsers: "Find people",
+    suggestedTitle: "Suggested for you",
     newPosts: "Show new posts",
     loadingMore: "Loading…",
     loadMore: "Show more",

@@ -12,12 +12,14 @@ const NEW_POSTS_POLL_MS = 30000;
 export function FeedList({
   endpoint,
   emptyMessage,
+  emptyExtra,
   currentUsername,
   storageKey,
   injectedPost,
 }: {
   endpoint: string;
   emptyMessage: string;
+  emptyExtra?: React.ReactNode;
   currentUsername?: string;
   storageKey: string;
   injectedPost?: Post | null;
@@ -159,6 +161,7 @@ export function FeedList({
             </svg>
           </div>
           <p className="text-sm text-[var(--fg-muted)]">{emptyMessage}</p>
+          {emptyExtra && <div className="w-full">{emptyExtra}</div>}
         </div>
       ) : (
         items.map((post) => (

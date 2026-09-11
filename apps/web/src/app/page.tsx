@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { FeedList } from "@/components/FeedList";
 import { SettingsMenu } from "@/components/SettingsMenu";
+import { SuggestedUsers } from "@/components/SuggestedUsers";
 import { api, type Post, type Topic, type UserMe } from "@/lib/api";
 import { topicName, useI18n } from "@/lib/i18n";
 
@@ -104,6 +105,7 @@ export default function HomePage() {
             <FeedList
               endpoint="/feed/following"
               emptyMessage={dict.feed.emptyFollowing}
+              emptyExtra={<SuggestedUsers />}
               currentUsername={user.username}
               storageKey="following"
               injectedPost={injectedPost}

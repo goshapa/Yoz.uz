@@ -14,10 +14,10 @@ from app.models.post import Post
 from app.models.post_image import PostImage
 from app.models.user import User
 from app.schemas.auth import MessageResponse
-from app.schemas.post import FeedPage
+from app.schemas.post import FeedPage, PostAuthor
 from app.schemas.user import DeleteAccountRequest, FollowListPage, ProfileOut, UserMe
 from app.services.activity_feed import paginate_activity
-from app.services.blocks import is_blocked
+from app.services.blocks import get_related_block_ids, is_blocked
 from app.services.images import process_upload
 from app.services.notifications import notify
 from app.services.pagination import clamp_limit, decode_cursor, encode_cursor
@@ -100,6 +100,46 @@ async def delete_current_user(
     await db.delete(current_user)
     await db.commit()
     return MessageResponse(message="Аккаунт удалён")
+
+
+@router.get("/suggestions/follow", response_model=list[PostAuthor])
+async def follow_suggestions(
+    limit: int = 12,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Кого предложить зафолловить — используется на онбординге новых пользователей
+    (пустая лента «Подписки»). Основатель — всегда первым, дальше по числу подписчиков."""
+    limit = clamp_limit(limit)
+    following_ids = select(Follow.followee_id).where(Follow.follower_id == current_user.id)
+    blocked_ids = await get_related_block_ids(db, current_user.id)
+
+    followers_count = (
+        select(Follow.followee_id, func.count().label("followers_count"))
+        .group_by(Follow.followee_id)
+        .subquery()
+    )
+
+    query = (
+        select(User)
+        .outerjoin(followers_count, followers_count.c.followee_id == User.id)
+        .where(
+            User.id != current_user.id,
+            User.id.not_in(following_ids),
+            User.is_suspended.is_(False),
+        )
+    )
+    if blocked_ids:
+        query = query.where(User.id.not_in(blocked_ids))
+
+    query = query.order_by(
+        User.is_founder.desc(),
+        func.coalesce(followers_count.c.followers_count, 0).desc(),
+        User.created_at.asc(),
+    ).limit(limit)
+
+    users = (await db.execute(query)).scalars().all()
+    return [to_author(u) for u in users]
 
 
 async def _get_profile_user(db: AsyncSession, username: str) -> User:
