@@ -1,0 +1,44 @@
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+      - api
+
+  # На проде наружу торчит только Caddy (80/443) — web и api доступны ему
+  # напрямую по внутренней docker-сети, публиковать их порты на хост не нужно.
+  # volumes/command — боевая сборка из Dockerfile, без dev-режима и hot-reload.
+  # Compose по умолчанию ДОБАВЛЯЕТ списки (volumes/ports) к базовым, а не заменяет —
+  # !reset обязателен, иначе dev-bind-mount и прямые порты остаются активны поверх.
+  web:
+    command: ["npm", "start"]
+    volumes: !reset []
+    ports: !reset []
+
+  api:
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    volumes: !reset []
+    ports: !reset []
+
+  # postgres/redis/minio — только внутри docker-сети, наружу их светить незачем
+  # (web/api обращаются к ним по internal-адресам вроде postgres:5432).
+  postgres:
+    ports: !reset []
+
+  redis:
+    ports: !reset []
+
+  minio:
+    ports: !reset []
+
+volumes:
+  caddy_data:
+  caddy_config:

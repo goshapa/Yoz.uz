@@ -1,0 +1,23 @@
+yozapp.uz {
+	# HSTS — только здесь: у Caddy уже есть настоящий домен и TLS-сертификат,
+	# поэтому можно безопасно закрепить HTTPS-only на год (с поддоменами).
+	header Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+	# API — напрямую в контейнер api, в обход Next.js (быстрее и надёжнее для
+	# больших загрузок изображений). Next.js со своей стороны тоже умеет
+	# проксировать /api/* (см. apps/web/next.config.mjs) — это работает
+	# одинаково что через Caddy, что при локальной разработке без него.
+	handle /api/* {
+		reverse_proxy api:8000
+	}
+
+	# Картинки (аватары, обложки, публикации) отдаёт MinIO. Путь /yoz-media/*
+	# должен совпадать с S3_BUCKET из .env — поменяли бакет, поправьте и здесь.
+	handle /yoz-media/* {
+		reverse_proxy minio:9000
+	}
+
+	handle {
+		reverse_proxy web:3000
+	}
+}

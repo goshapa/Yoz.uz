@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #f2f6f5;
+  --bg-elevated: #ffffff;
+  --fg: #0a1615;
+  --fg-muted: #4d5c59;
+  --border: #c9d6d3;
+}
+
+.dark {
+  --bg: #0a1211;
+  --bg-elevated: #141f1d;
+  --fg: #f0f7f5;
+  --fg-muted: #96a9a5;
+  --border: #2e433e;
+}
+
+html {
+  /* Не даём мобильному браузеру "резиновым" жестом двигать всю страницу —
+     иначе перетягивание за кнопку/шапку в чате уводит весь интерфейс. Обычные
+     скролл-контейнеры (лента, список сообщений) внутри страницы это не трогает. */
+  overscroll-behavior: none;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  overscroll-behavior: none;
+}
+
+/* Полная блокировка прокрутки/перетягивания фона, пока открыт полноэкранный чат
+   (см. useLockBodyScroll в messages/[username]) — body физически не может
+   сдвинуться, это надёжнее overscroll-behavior и переживает баги с клавиатурой
+   на мобильных Safari/Chrome, из-за которых иначе "уезжает" вся страница. */
+html.body-scroll-locked,
+body.body-scroll-locked {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+@layer components {
+  .card {
+    @apply bg-[var(--bg-elevated)] border-[1.5px] border-[var(--border)] rounded-xl shadow-lg shadow-black/[0.08] dark:shadow-black/50;
+  }
+
+  /* text-base (16px) на мобильном — иначе iOS Safari сам зумит страницу при фокусе
+     на поле с меньшим шрифтом и не всегда откатывает зум обратно после blur. */
+  .input {
+    @apply w-full rounded-lg border-[1.5px] border-[var(--border)] bg-[var(--bg-elevated)] px-3 py-2 text-base font-medium outline-none transition focus:border-accent-600 focus:ring-2 focus:ring-accent-500/30 sm:text-sm;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-lg bg-accent-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-accent-900/25 transition hover:bg-accent-700 hover:shadow-xl hover:shadow-accent-900/30 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-accent-500/50 active:bg-accent-800 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none disabled:hover:translate-y-0;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-lg border-2 border-[var(--border)] px-5 py-2.5 text-sm font-bold transition hover:border-accent-600 hover:bg-accent-500/5;
+  }
+
+  /* Компактные варианты для тесных мест: мобильный хедер, панель админа, инлайн-кнопки в карточках. */
+  .btn-primary-sm {
+    @apply inline-flex items-center justify-center rounded-lg bg-accent-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm shadow-accent-900/25 transition hover:bg-accent-700 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-secondary-sm {
+    @apply inline-flex items-center justify-center rounded-lg border-2 border-[var(--border)] px-3 py-1.5 text-xs font-bold transition hover:border-accent-600 hover:bg-accent-500/5;
+  }
+
+  .label {
+    @apply mb-1 block text-sm font-bold text-[var(--fg-muted)];
+  }
+
+  .field-error {
+    @apply mt-1 text-sm font-medium text-red-500;
+  }
+
+  .text-gradient {
+    @apply text-accent-600 dark:text-accent-400;
+  }
+
+  .logo-mark {
+    @apply flex items-center justify-center rounded-lg bg-accent-600 font-black text-white shadow-md shadow-accent-900/40;
+  }
+
+  .bg-mesh {
+    @apply pointer-events-none fixed inset-0 -z-10 overflow-hidden;
+  }
+}

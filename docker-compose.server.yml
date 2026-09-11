@@ -1,0 +1,30 @@
+# Для боевого сервера БЕЗ домена (доступ по IP): убирает dev-volumes и dev-команды
+# из docker-compose.yml. Наружу торчит только web (3000) — им пользуется браузер
+# напрямую, пока нет домена и Caddy перед ним. Всё остальное (api, postgres,
+# redis, minio) видно только внутри docker-сети — наружу им светить незачем,
+# web/api и так обращаются друг к другу по внутренним адресам (api:8000,
+# postgres:5432, redis:6379, minio:9000), это не требует открытых портов на хосте.
+# Запуск: docker compose -f docker-compose.yml -f docker-compose.server.yml up -d --build
+#
+# Когда появится домен — переключиться на docker-compose.prod.yml (добавляет Caddy
+# с автоматическим HTTPS и прячет даже web за ним).
+services:
+  api:
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    # Compose по умолчанию ДОБАВЛЯЕТ volumes/ports к базовым, а не заменяет —
+    # !reset обязателен, иначе dev-bind-mount и открытый порт остаются активны.
+    volumes: !reset []
+    ports: !reset []
+
+  web:
+    command: ["npm", "start"]
+    volumes: !reset []
+
+  postgres:
+    ports: !reset []
+
+  redis:
+    ports: !reset []
+
+  minio:
+    ports: !reset []
