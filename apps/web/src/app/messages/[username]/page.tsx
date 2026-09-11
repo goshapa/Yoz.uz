@@ -469,7 +469,7 @@ export default function ConversationPage() {
                     <input
                       ref={fileInputRef}
                       type="file"
-                      accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime"
+                      accept="image/*,video/*"
                       className="hidden"
                       onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)}
                     />
