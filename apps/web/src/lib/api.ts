@@ -264,6 +264,8 @@ export type GroupMessage = {
   attachment_url: string | null;
   attachment_thumbnail_url: string | null;
   attachment_type: "image" | "video" | null;
+  forwarded_from: PostAuthor | null;
+  reactions: MessageReaction[];
   created_at: string;
   edited_at: string | null;
   is_deleted: boolean;

@@ -3,6 +3,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, field_validator
 
+from app.schemas.message import ReactionSummary
 from app.schemas.post import PostAuthor
 
 TITLE_MAX_LENGTH = 100
@@ -118,6 +119,8 @@ class GroupMessageOut(BaseModel):
     attachment_url: str | None
     attachment_thumbnail_url: str | None
     attachment_type: str | None
+    forwarded_from: PostAuthor | None
+    reactions: list[ReactionSummary]
     created_at: datetime
     edited_at: datetime | None
     is_deleted: bool

@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
 import { Avatar } from "@/components/Avatar";
+import { ForwardModal } from "@/components/ForwardModal";
 import { GroupMessageBubble } from "@/components/GroupMessageBubble";
 import { Icon } from "@/components/icons";
 import { LoadingState, Spinner } from "@/components/Spinner";
@@ -42,6 +43,7 @@ export default function GroupChatPage() {
   const [actionMenuFor, setActionMenuFor] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
+  const [forwardMessage, setForwardMessage] = useState<GroupMessage | null>(null);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const latestIdRef = useRef<string | null>(null);
@@ -224,6 +226,20 @@ export default function GroupChatPage() {
     }
   }
 
+  async function toggleReaction(message: GroupMessage, emoji: string) {
+    setActionMenuFor(null);
+    const mine = message.reactions.find((r) => r.reacted_by_viewer);
+    try {
+      const updated =
+        mine && mine.emoji === emoji
+          ? await api.del<GroupMessage>(`/groups/${groupId}/messages/${message.id}/reactions`)
+          : await api.put<GroupMessage>(`/groups/${groupId}/messages/${message.id}/reactions`, { emoji });
+      setItems((current) => current?.map((m) => (m.id === updated.id ? updated : m)) ?? null);
+    } catch {
+      // молча игнорируем сбой реакции
+    }
+  }
+
   return (
     <AppShell user={viewer}>
       <div className="fixed inset-0 z-20 flex flex-col overscroll-none bg-[var(--bg)] md:static md:inset-auto md:z-auto md:h-[100dvh]">
@@ -278,6 +294,11 @@ export default function GroupChatPage() {
                         dict={dict}
                         menuOpen={actionMenuFor === m.id}
                         onOpenMenu={() => setActionMenuFor(m.id)}
+                        onReact={(emoji) => toggleReaction(m, emoji)}
+                        onForward={() => {
+                          setActionMenuFor(null);
+                          setForwardMessage(m);
+                        }}
                         onEdit={() => startEdit(m)}
                         onDelete={() => handleDeleteMessage(m)}
                         editing={editingId === m.id}
@@ -366,6 +387,18 @@ export default function GroupChatPage() {
           </>
         )}
       </div>
+
+      {forwardMessage && (
+        <ForwardModal
+          message={{
+            text: forwardMessage.text,
+            attachment_url: forwardMessage.attachment_url,
+            attachment_type: forwardMessage.attachment_type,
+            forwardOriginId: forwardMessage.forwarded_from?.id ?? forwardMessage.sender.id,
+          }}
+          onClose={() => setForwardMessage(null)}
+        />
+      )}
     </AppShell>
   );
 }

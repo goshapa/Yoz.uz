@@ -8,6 +8,8 @@ import type { GroupMessage } from "@/lib/api";
 import type { Dictionary } from "@/lib/i18n/locales/ru";
 import { formatClockTime } from "@/lib/time";
 
+export const REACTION_EMOJIS = ["👍", "❤️", "😂", "😮", "😢", "🙏", "🔥", "👏"];
+
 const LONG_PRESS_MS = 450;
 const MOVE_CANCEL_PX = 8;
 
@@ -17,6 +19,8 @@ export function GroupMessageBubble({
   dict,
   menuOpen,
   onOpenMenu,
+  onReact,
+  onForward,
   onEdit,
   onDelete,
   editing,
@@ -30,6 +34,8 @@ export function GroupMessageBubble({
   dict: Dictionary;
   menuOpen: boolean;
   onOpenMenu: () => void;
+  onReact: (emoji: string) => void;
+  onForward: () => void;
   onEdit: () => void;
   onDelete: () => void;
   editing: boolean;
@@ -61,7 +67,7 @@ export function GroupMessageBubble({
   }
 
   function handlePointerDown(e: React.PointerEvent) {
-    if (!mine || editing) return;
+    if (editing) return;
     startRef.current = { x: e.clientX, y: e.clientY };
     movedRef.current = false;
     clearLongPress();
@@ -89,12 +95,23 @@ export function GroupMessageBubble({
           onPointerMove={handlePointerMove}
           onPointerUp={clearLongPress}
           onPointerCancel={clearLongPress}
-          onContextMenu={(e) => mine && e.preventDefault()}
+          onContextMenu={(e) => e.preventDefault()}
           className={`relative min-w-0 select-none rounded-2xl px-3.5 py-2 text-sm ${
             mine ? "rounded-br-sm bg-accent-600 text-white" : "rounded-bl-sm bg-[var(--bg-elevated)] text-[var(--fg)]"
           }`}
         >
           {!mine && <p className="mb-0.5 text-xs font-semibold text-accent-600 dark:text-accent-400">{message.sender.display_name}</p>}
+
+          {message.forwarded_from && (
+            <p
+              className={`mb-1 flex items-center gap-1 text-xs italic ${
+                mine ? "text-white/70" : "text-[var(--fg-muted)]"
+              }`}
+            >
+              <Icon name="forward" size={12} />
+              {dict.messages.forwardedFrom} {message.forwarded_from.display_name}
+            </p>
+          )}
 
           {editing ? (
             <div className="space-y-1.5">
@@ -140,33 +157,83 @@ export function GroupMessageBubble({
               {formatClockTime(message.created_at)}
             </p>
           )}
+
+          {message.reactions.length > 0 && (
+            <div
+              className={`absolute -bottom-3 flex items-center gap-1 rounded-full border-2 border-[var(--bg)] bg-[var(--bg-elevated)] px-1.5 py-0.5 shadow-sm ${
+                mine ? "right-2" : "left-2"
+              }`}
+            >
+              {message.reactions.map((r) => (
+                <button
+                  key={r.emoji}
+                  type="button"
+                  onClick={() => onReact(r.emoji)}
+                  className={`flex items-center gap-0.5 text-xs leading-none ${
+                    r.reacted_by_viewer ? "text-accent-600 dark:text-accent-400" : "text-[var(--fg-muted)]"
+                  }`}
+                >
+                  <span>{r.emoji}</span>
+                  <span>{r.count}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      {mine && menuOpen && !editing && (
+      {menuOpen && !editing && (
         <div
           data-message-menu
-          className="mt-2 w-44 rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)] p-1.5 shadow-lg"
+          className={`w-72 max-w-[90vw] rounded-xl border border-[var(--border)] bg-[var(--bg-elevated)] p-1.5 shadow-lg ${
+            message.reactions.length > 0 ? "mt-4" : "mt-2"
+          }`}
         >
-          <button
-            type="button"
-            onClick={onEdit}
-            className="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left text-sm hover:bg-black/5 dark:hover:bg-white/10"
-          >
-            <Icon name="pencil" size={16} />
-            {dict.messages.edit}
-          </button>
-          <button
-            type="button"
-            onClick={() => (confirmingDelete ? onDelete() : setConfirmingDelete(true))}
-            onBlur={() => setConfirmingDelete(false)}
-            className={`flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left text-sm hover:bg-red-500/10 ${
-              confirmingDelete ? "font-semibold text-red-600" : "text-red-600"
-            }`}
-          >
-            <Icon name="trash" size={16} />
-            {confirmingDelete ? dict.messages.deleteMessageConfirm : dict.messages.delete}
-          </button>
+          <div className="flex items-center justify-between border-b border-[var(--border)] pb-1.5">
+            {REACTION_EMOJIS.map((emoji) => (
+              <button
+                key={emoji}
+                type="button"
+                onClick={() => onReact(emoji)}
+                className="rounded-full py-0.5 text-lg hover:bg-black/5 dark:hover:bg-white/10"
+              >
+                {emoji}
+              </button>
+            ))}
+          </div>
+          <div className="pt-1">
+            <button
+              type="button"
+              onClick={onForward}
+              className="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left text-sm hover:bg-black/5 dark:hover:bg-white/10"
+            >
+              <Icon name="forward" size={16} />
+              {dict.messages.forward}
+            </button>
+            {mine && (
+              <button
+                type="button"
+                onClick={onEdit}
+                className="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left text-sm hover:bg-black/5 dark:hover:bg-white/10"
+              >
+                <Icon name="pencil" size={16} />
+                {dict.messages.edit}
+              </button>
+            )}
+            {mine && (
+              <button
+                type="button"
+                onClick={() => (confirmingDelete ? onDelete() : setConfirmingDelete(true))}
+                onBlur={() => setConfirmingDelete(false)}
+                className={`flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left text-sm hover:bg-red-500/10 ${
+                  confirmingDelete ? "font-semibold text-red-600" : "text-red-600"
+                }`}
+              >
+                <Icon name="trash" size={16} />
+                {confirmingDelete ? dict.messages.deleteMessageConfirm : dict.messages.delete}
+              </button>
+            )}
+          </div>
         </div>
       )}
     </div>

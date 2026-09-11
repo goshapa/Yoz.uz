@@ -3,15 +3,16 @@ import uuid
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
-from sqlalchemy import func, select, tuple_
+from sqlalchemy import delete, func, select, tuple_
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user
 from app.db.session import get_db
-from app.models.group import GroupChat, GroupMember, GroupMessage, GroupRole
+from app.models.group import GroupChat, GroupMember, GroupMessage, GroupMessageReaction, GroupRole
 from app.models.user import User
 from app.schemas.auth import MessageResponse
-from app.schemas.message import EditMessageRequest
+from app.schemas.message import EditMessageRequest, ReactionRequest, ReactionSummary
 from app.schemas.group import (
     AddGroupMembersRequest,
     CreateGroupRequest,
@@ -279,15 +280,39 @@ async def remove_group_member(
     return MessageResponse(message="Готово" if is_self else "Участник удалён")
 
 
-async def _serialize_group_messages(db: AsyncSession, messages: list[GroupMessage]) -> list[GroupMessageOut]:
+async def _serialize_group_messages(
+    db: AsyncSession, messages: list[GroupMessage], viewer_id: uuid.UUID
+) -> list[GroupMessageOut]:
     if not messages:
         return []
-    sender_ids = {m.sender_id for m in messages}
-    senders_by_id = {u.id: u for u in (await db.execute(select(User).where(User.id.in_(sender_ids)))).scalars()}
+    message_ids = [m.id for m in messages]
+
+    user_ids = {m.sender_id for m in messages} | {m.forwarded_from_id for m in messages if m.forwarded_from_id}
+    users_by_id = {u.id: u for u in (await db.execute(select(User).where(User.id.in_(user_ids)))).scalars()}
+
+    reactions_result = await db.execute(
+        select(GroupMessageReaction).where(GroupMessageReaction.message_id.in_(message_ids))
+    )
+    reactions_by_message: dict[uuid.UUID, list[GroupMessageReaction]] = {}
+    for r in reactions_result.scalars():
+        reactions_by_message.setdefault(r.message_id, []).append(r)
+
+    def reaction_summaries(message_id: uuid.UUID) -> list[ReactionSummary]:
+        rows = reactions_by_message.get(message_id, [])
+        counts: dict[str, int] = {}
+        viewer_emoji: str | None = None
+        for r in rows:
+            counts[r.emoji] = counts.get(r.emoji, 0) + 1
+            if r.user_id == viewer_id:
+                viewer_emoji = r.emoji
+        return [
+            ReactionSummary(emoji=emoji, count=count, reacted_by_viewer=emoji == viewer_emoji)
+            for emoji, count in counts.items()
+        ]
 
     items = []
     for m in messages:
-        sender = senders_by_id.get(m.sender_id)
+        sender = users_by_id.get(m.sender_id)
         items.append(
             GroupMessageOut(
                 id=m.id,
@@ -297,6 +322,8 @@ async def _serialize_group_messages(db: AsyncSession, messages: list[GroupMessag
                 attachment_url=None if m.deleted_at else m.attachment_url,
                 attachment_thumbnail_url=None if m.deleted_at else m.attachment_thumbnail_url,
                 attachment_type=None if m.deleted_at or not m.attachment_type else m.attachment_type.value,
+                forwarded_from=to_author(users_by_id.get(m.forwarded_from_id)) if m.forwarded_from_id else None,
+                reactions=reaction_summaries(m.id),
                 created_at=m.created_at,
                 edited_at=m.edited_at,
                 is_deleted=m.deleted_at is not None,
@@ -332,7 +359,7 @@ async def get_group_messages(
         membership.last_read_at = datetime.now(timezone.utc)
         await db.commit()
 
-    items = await _serialize_group_messages(db, rows)
+    items = await _serialize_group_messages(db, rows, current_user.id)
     next_cursor = encode_cursor(rows[-1].created_at, rows[-1].id) if has_more and rows else None
     return GroupMessagePage(items=items, next_cursor=next_cursor)
 
@@ -348,6 +375,7 @@ async def send_group_message(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
     text: str | None = Form(default=None),
+    forwarded_from_id: uuid.UUID | None = Form(default=None),
     attachment: UploadFile | None = File(default=None),
 ):
     await _get_membership(db, group_id, current_user.id)
@@ -361,6 +389,10 @@ async def send_group_message(
     if not clean_text and not has_attachment:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Сообщение не может быть пустым")
 
+    resolved_forwarded_from: uuid.UUID | None = None
+    if forwarded_from_id is not None and await db.get(User, forwarded_from_id) is not None:
+        resolved_forwarded_from = forwarded_from_id
+
     attachment_type = attachment_url = attachment_thumbnail_url = None
     if has_attachment:
         processed = await process_message_attachment(attachment)
@@ -372,6 +404,7 @@ async def send_group_message(
         group_id=group_id,
         sender_id=current_user.id,
         text=clean_text,
+        forwarded_from_id=resolved_forwarded_from,
         attachment_type=attachment_type,
         attachment_url=attachment_url,
         attachment_thumbnail_url=attachment_thumbnail_url,
@@ -381,7 +414,7 @@ async def send_group_message(
     await db.commit()
     await db.refresh(message)
 
-    items = await _serialize_group_messages(db, [message])
+    items = await _serialize_group_messages(db, [message], current_user.id)
     return items[0]
 
 
@@ -409,7 +442,57 @@ async def edit_group_message(
     await db.commit()
     await db.refresh(message)
 
-    items = await _serialize_group_messages(db, [message])
+    items = await _serialize_group_messages(db, [message], current_user.id)
+    return items[0]
+
+
+async def _get_visible_group_message(
+    db: AsyncSession, group_id: uuid.UUID, message_id: uuid.UUID, current_user: User
+) -> GroupMessage:
+    await _get_membership(db, group_id, current_user.id)
+    message = await db.get(GroupMessage, message_id)
+    if message is None or message.group_id != group_id or message.deleted_at is not None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Сообщение не найдено")
+    return message
+
+
+@router.put("/{group_id}/messages/{message_id}/reactions", response_model=GroupMessageOut)
+async def set_group_reaction(
+    group_id: uuid.UUID,
+    message_id: uuid.UUID,
+    payload: ReactionRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    message = await _get_visible_group_message(db, group_id, message_id, current_user)
+    await db.execute(
+        pg_insert(GroupMessageReaction)
+        .values(message_id=message.id, user_id=current_user.id, emoji=payload.emoji)
+        .on_conflict_do_update(
+            index_elements=[GroupMessageReaction.message_id, GroupMessageReaction.user_id],
+            set_={"emoji": payload.emoji},
+        )
+    )
+    await db.commit()
+    items = await _serialize_group_messages(db, [message], current_user.id)
+    return items[0]
+
+
+@router.delete("/{group_id}/messages/{message_id}/reactions", response_model=GroupMessageOut)
+async def remove_group_reaction(
+    group_id: uuid.UUID,
+    message_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    message = await _get_visible_group_message(db, group_id, message_id, current_user)
+    await db.execute(
+        delete(GroupMessageReaction).where(
+            GroupMessageReaction.message_id == message.id, GroupMessageReaction.user_id == current_user.id
+        )
+    )
+    await db.commit()
+    items = await _serialize_group_messages(db, [message], current_user.id)
     return items[0]
 
 
@@ -426,6 +509,7 @@ async def delete_group_message(
     message.attachment_url = None
     message.attachment_thumbnail_url = None
     message.attachment_type = None
+    await db.execute(delete(GroupMessageReaction).where(GroupMessageReaction.message_id == message.id))
     await db.commit()
     return MessageResponse(message="Сообщение удалено")
 

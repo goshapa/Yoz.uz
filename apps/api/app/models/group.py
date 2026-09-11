@@ -75,8 +75,32 @@ class GroupMessage(Base):
         Enum(AttachmentType, name="group_message_attachment_type"), nullable=True
     )
 
+    # Автор исходного сообщения при пересылке (из ЛС или другой группы) — не обязательно
+    # участник этой группы, поэтому отдельное поле, а не ссылка на другого участника.
+    forwarded_from_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False, index=True
     )
     edited_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class GroupMessageReaction(Base):
+    """Одна реакция на групповое сообщение от одного участника — как DirectMessageReaction,
+    но со своим FK на group_messages (не переиспользуем таблицу личных реакций)."""
+
+    __tablename__ = "group_message_reactions"
+
+    message_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("group_messages.id", ondelete="CASCADE"), primary_key=True
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+    )
+    emoji: Mapped[str] = mapped_column(String(8), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
