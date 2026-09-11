@@ -72,7 +72,7 @@ export default function SearchPage() {
         />
         <div className="flex gap-2">
           <select
-            className="input w-auto text-base sm:text-xs"
+            className="input min-w-0 flex-1 text-base sm:text-xs"
             value={topicFilter}
             onChange={(e) => setTopicFilter(e.target.value)}
           >
@@ -84,7 +84,7 @@ export default function SearchPage() {
             ))}
           </select>
           <input
-            className="input w-auto text-base sm:text-xs"
+            className="input min-w-0 flex-1 text-base sm:text-xs"
             placeholder={dict.feed.cityPlaceholder}
             value={cityFilter}
             onChange={(e) => setCityFilter(e.target.value)}
