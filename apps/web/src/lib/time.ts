@@ -13,6 +13,14 @@ export function formatClockTime(iso: string): string {
   return `${hours}:${minutes}`;
 }
 
+// last_seen_at обновляется на сервере не чаще раза в минуту (см. deps.py),
+// так что порог "в сети" должен быть заметно больше этого интервала.
+const ONLINE_THRESHOLD_MS = 3 * 60 * 1000;
+
+export function isOnline(lastSeenAtIso: string): boolean {
+  return Date.now() - new Date(lastSeenAtIso).getTime() < ONLINE_THRESHOLD_MS;
+}
+
 export function formatRelativeTime(iso: string, locale: Locale): string {
   const date = new Date(iso);
   const diffSec = Math.floor((Date.now() - date.getTime()) / 1000);

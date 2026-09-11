@@ -10,6 +10,8 @@ const en: Dictionary = {
     themeLight: "Light",
     themeDark: "Dark",
     settings: "Display settings",
+    online: "Online",
+    lastSeenAt: "Last seen",
   },
   nav: {
     home: "Home",

@@ -10,6 +10,8 @@ const uz: Dictionary = {
     themeLight: "Yorug‘",
     themeDark: "Qorong‘i",
     settings: "Ko‘rinish sozlamalari",
+    online: "Onlayn",
+    lastSeenAt: "Oxirgi marta",
   },
   nav: {
     home: "Bosh sahifa",

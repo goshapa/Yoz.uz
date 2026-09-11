@@ -22,6 +22,7 @@ class UserPublic(BaseModel):
     website: str | None
     is_founder: bool = False
     created_at: datetime
+    last_seen_at: datetime
 
 
 class UserMe(UserPublic):

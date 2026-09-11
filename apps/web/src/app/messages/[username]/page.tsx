@@ -13,6 +13,7 @@ import { Icon } from "@/components/icons";
 import { LoadingState, Spinner } from "@/components/Spinner";
 import { api, ApiError, type DirectMessage, type DirectMessagePage, type Profile, type UserMe } from "@/lib/api";
 import { useI18n } from "@/lib/i18n";
+import { formatRelativeTime, isOnline } from "@/lib/time";
 import { useLockBodyScroll } from "@/lib/useLockBodyScroll";
 
 const POLL_MS = 4000;
@@ -26,7 +27,7 @@ type AttachmentDraft = {
 };
 
 export default function ConversationPage() {
-  const { dict } = useI18n();
+  const { dict, locale } = useI18n();
   const router = useRouter();
   const params = useParams<{ username: string }>();
   const username = params.username;
@@ -71,6 +72,18 @@ export default function ConversationPage() {
       .get<Profile>(`/users/${username}`)
       .then(setPeer)
       .catch(() => setPeer("not-found"));
+  }, [username]);
+
+  // Обновляем профиль собеседника, чтобы статус "в сети" не зависал устаревшим
+  // на весь визит в диалог.
+  useEffect(() => {
+    const interval = setInterval(() => {
+      api
+        .get<Profile>(`/users/${username}`)
+        .then(setPeer)
+        .catch(() => {});
+    }, 30000);
+    return () => clearInterval(interval);
   }, [username]);
 
   const loadLatest = useCallback(() => api.get<DirectMessagePage>(`/messages/${username}`), [username]);
@@ -280,9 +293,18 @@ export default function ConversationPage() {
           {peer && peer !== "not-found" && (
             <Link href={`/u/${peer.username}`} className="flex min-w-0 flex-1 items-center gap-2">
               <Avatar src={peer.avatar_url} name={peer.display_name} size={32} />
-              <span className="inline-flex min-w-0 items-center gap-1 truncate font-medium">
-                {peer.display_name}
-                {peer.is_founder && <FounderBadge size={9} />}
+              <span className="min-w-0">
+                <span className="inline-flex min-w-0 items-center gap-1 truncate font-medium">
+                  {peer.display_name}
+                  {peer.is_founder && <FounderBadge size={9} />}
+                </span>
+                <span className="block text-xs text-[var(--fg-muted)]">
+                  {isOnline(peer.last_seen_at) ? (
+                    <span className="font-medium text-emerald-600 dark:text-emerald-400">{dict.common.online}</span>
+                  ) : (
+                    `${dict.common.lastSeenAt} ${formatRelativeTime(peer.last_seen_at, locale)}`
+                  )}
+                </span>
               </span>
             </Link>
           )}

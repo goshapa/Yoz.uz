@@ -12,6 +12,18 @@ from app.models.user import User, UserRole
 
 settings = get_settings()
 
+# Не пишем last_seen_at на каждый запрос — слишком много лишних апдейтов при
+# активном использовании. Обновляем не чаще раза в этот промежуток.
+LAST_SEEN_UPDATE_INTERVAL_SECONDS = 60
+
+
+async def _touch_last_seen(db: AsyncSession, user: User) -> None:
+    now = datetime.now(timezone.utc)
+    if (now - user.last_seen_at.replace(tzinfo=timezone.utc)).total_seconds() < LAST_SEEN_UPDATE_INTERVAL_SECONDS:
+        return
+    user.last_seen_at = now
+    await db.commit()
+
 
 async def _load_user_from_cookie(request: Request, db: AsyncSession) -> User | None:
     raw_token = request.cookies.get(settings.session_cookie_name)
@@ -28,7 +40,10 @@ async def _load_user_from_cookie(request: Request, db: AsyncSession) -> User | N
         return None
 
     user_result = await db.execute(select(User).where(User.id == session.user_id))
-    return user_result.scalar_one_or_none()
+    user = user_result.scalar_one_or_none()
+    if user is not None:
+        await _touch_last_seen(db, user)
+    return user
 
 
 async def get_current_user_optional(

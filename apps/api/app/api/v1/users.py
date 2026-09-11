@@ -185,6 +185,7 @@ def _profile_out(
         website=user.website,
         is_founder=user.is_founder,
         created_at=user.created_at,
+        last_seen_at=user.last_seen_at,
         followers_count=followers_count,
         following_count=following_count,
         is_following=is_following,

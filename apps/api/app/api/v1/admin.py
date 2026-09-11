@@ -244,6 +244,7 @@ async def list_users(
             email_verified=u.email_verified,
             is_founder=u.is_founder,
             created_at=u.created_at,
+            last_seen_at=u.last_seen_at,
         )
         for u in rows
     ]

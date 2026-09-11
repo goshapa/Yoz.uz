@@ -100,6 +100,7 @@ class AdminUserOut(BaseModel):
     email_verified: bool
     is_founder: bool
     created_at: datetime
+    last_seen_at: datetime
 
 
 class AdminUserPage(BaseModel):

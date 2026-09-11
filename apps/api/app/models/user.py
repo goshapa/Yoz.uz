@@ -59,3 +59,8 @@ class User(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
     )
+    # Обновляется в get_current_user при каждом аутентифицированном запросе (не чаще раза
+    # в минуту — см. _touch_last_seen в app/api/deps.py).
+    last_seen_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )

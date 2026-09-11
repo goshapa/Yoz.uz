@@ -8,7 +8,7 @@ import { Avatar } from "@/components/Avatar";
 import { LoadingState } from "@/components/Spinner";
 import { api, type UserMe } from "@/lib/api";
 import { useI18n } from "@/lib/i18n";
-import { formatRelativeTime } from "@/lib/time";
+import { formatRelativeTime, isOnline } from "@/lib/time";
 
 type AdminAuthor = { id: string; display_name: string; username: string; avatar_url: string | null };
 
@@ -24,6 +24,7 @@ type AdminUser = {
   email_verified: boolean;
   is_founder: boolean;
   created_at: string;
+  last_seen_at: string;
 };
 
 type AdminReport = {
@@ -317,6 +318,18 @@ function UsersTab({ isAdmin }: { isAdmin: boolean }) {
             )}
             <p className="mt-0.5 text-xs text-[var(--fg-muted)]">
               {dict.profile.joined} {formatRelativeTime(u.created_at, locale)}
+            </p>
+            <p className="mt-0.5 flex items-center gap-1.5 text-xs text-[var(--fg-muted)]">
+              {isOnline(u.last_seen_at) ? (
+                <>
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  <span className="font-medium text-emerald-600 dark:text-emerald-400">{dict.common.online}</span>
+                </>
+              ) : (
+                <>
+                  {dict.common.lastSeenAt} {formatRelativeTime(u.last_seen_at, locale)}
+                </>
+              )}
             </p>
 
             <div className="mt-2 flex flex-wrap gap-2">

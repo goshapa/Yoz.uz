@@ -82,6 +82,7 @@ export type UserMe = {
   website: string | null;
   is_founder: boolean;
   created_at: string;
+  last_seen_at: string;
 };
 
 export type LoginResult = {
@@ -287,6 +288,7 @@ export type Profile = {
   website: string | null;
   is_founder: boolean;
   created_at: string;
+  last_seen_at: string;
   followers_count: number;
   following_count: number;
   is_following: boolean;

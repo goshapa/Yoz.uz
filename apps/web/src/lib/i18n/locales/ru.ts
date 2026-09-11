@@ -8,6 +8,8 @@ const ru = {
     themeLight: "Светлая",
     themeDark: "Тёмная",
     settings: "Настройки вида",
+    online: "В сети",
+    lastSeenAt: "Был(а) в сети",
   },
   nav: {
     home: "Главная",
