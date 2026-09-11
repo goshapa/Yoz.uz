@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Manrope } from "next/font/google";
 
 import { Providers } from "@/providers/Providers";
@@ -14,6 +14,22 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   title: "Yoz",
   description: "Fikringni yoz — соцсеть коротких публикаций для Узбекистана",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Yoz",
+  },
+  other: {
+    // Next.js сам добавляет современный mobile-web-app-capable; старые версии
+    // iOS Safari понимают только этот вендорный вариант — дублируем на всякий случай.
+    "apple-mobile-web-app-capable": "yes",
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#0f867e",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
