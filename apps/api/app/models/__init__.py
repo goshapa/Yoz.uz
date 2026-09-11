@@ -1,3 +1,4 @@
+from app.models.group import GroupChat, GroupMember, GroupMessage
 from app.models.hashtag import Hashtag, PostHashtag, PostMention
 from app.models.interactions import Block, Bookmark, Follow, Like, Repost
 from app.models.message import Conversation, DirectMessage, DirectMessageReaction
@@ -33,4 +34,7 @@ __all__ = [
     "Notification",
     "Report",
     "ModerationLogEntry",
+    "GroupChat",
+    "GroupMember",
+    "GroupMessage",
 ]

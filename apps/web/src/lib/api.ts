@@ -226,6 +226,54 @@ export type ConversationPage = {
   next_cursor: string | null;
 };
 
+export type GroupMember = PostAuthor & { role: "owner" | "member" };
+
+export type GroupSummary = {
+  id: string;
+  title: string;
+  avatar_url: string | null;
+  member_count: number;
+  last_message_text: string | null;
+  last_message_attachment_type: "image" | "video" | null;
+  last_message_at: string;
+  last_message_sender_name: string | null;
+  unread_count: number;
+};
+
+export type GroupListPage = {
+  items: GroupSummary[];
+  next_cursor: string | null;
+};
+
+export type Group = {
+  id: string;
+  title: string;
+  description: string | null;
+  avatar_url: string | null;
+  member_count: number;
+  is_owner: boolean;
+  created_at: string;
+  members: GroupMember[];
+};
+
+export type GroupMessage = {
+  id: string;
+  group_id: string;
+  sender: PostAuthor;
+  text: string | null;
+  attachment_url: string | null;
+  attachment_thumbnail_url: string | null;
+  attachment_type: "image" | "video" | null;
+  created_at: string;
+  edited_at: string | null;
+  is_deleted: boolean;
+};
+
+export type GroupMessagePage = {
+  items: GroupMessage[];
+  next_cursor: string | null;
+};
+
 export type Profile = {
   id: string;
   display_name: string;
