@@ -176,6 +176,7 @@ export default function ConversationPage() {
     try {
       const formData = new FormData();
       if (forwardMessage.text) formData.append("text", forwardMessage.text);
+      formData.append("forwarded_from_id", forwardMessage.forwarded_from?.id ?? forwardMessage.sender_id);
       if (forwardMessage.attachment_url) {
         const blob = await fetch(forwardMessage.attachment_url).then((r) => r.blob());
         const ext = forwardMessage.attachment_type === "video" ? "mp4" : "jpg";

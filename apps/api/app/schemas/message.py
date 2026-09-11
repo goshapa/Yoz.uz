@@ -30,6 +30,7 @@ class DirectMessageOut(BaseModel):
     attachment_thumbnail_url: str | None
     attachment_type: str | None
     reply_to: ReplyPreview | None
+    forwarded_from: PostAuthor | None
     reactions: list[ReactionSummary]
     created_at: datetime
     read_at: datetime | None

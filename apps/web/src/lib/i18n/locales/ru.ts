@@ -150,6 +150,7 @@ const ru = {
     attachmentUnsupported: "Поддерживаются только изображения и видео",
     removeAttachment: "Убрать вложение",
     forward: "Переслать",
+    forwardedFrom: "Переслано от",
     forwardTitle: "Переслать сообщение",
     forwardPlaceholder: "Кому переслать?",
     forwardSent: "Переслано",

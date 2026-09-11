@@ -118,6 +118,17 @@ export function DirectMessageBubble({
           mine ? "rounded-br-sm bg-accent-600 text-white" : "rounded-bl-sm bg-[var(--bg-elevated)] text-[var(--fg)]"
         }`}
       >
+          {message.forwarded_from && (
+            <p
+              className={`mb-1 flex items-center gap-1 text-xs italic ${
+                mine ? "text-white/70" : "text-[var(--fg-muted)]"
+              }`}
+            >
+              <Icon name="forward" size={12} />
+              {dict.messages.forwardedFrom} {message.forwarded_from.display_name}
+            </p>
+          )}
+
           {message.reply_to && (
             <div
               className={`mb-1.5 rounded-lg border-l-2 px-2 py-1 text-xs ${

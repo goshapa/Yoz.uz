@@ -58,6 +58,12 @@ class DirectMessage(Base):
     reply_to_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("direct_messages.id", ondelete="SET NULL"), nullable=True
     )
+    # Автор исходного сообщения при пересылке — не участник текущей переписки,
+    # поэтому не переиспользуем reply_to_id (там превью резолвится в предположении
+    # "либо я, либо собеседник", что для пересланного даёт неверное имя).
+    forwarded_from_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
     text: Mapped[str | None] = mapped_column(String(2000), nullable=True)
 
     attachment_url: Mapped[str | None] = mapped_column(String(500), nullable=True)

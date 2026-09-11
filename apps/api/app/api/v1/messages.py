@@ -95,6 +95,13 @@ async def _serialize_messages(
             m.id: m for m in (await db.execute(select(DirectMessage).where(DirectMessage.id.in_(reply_ids)))).scalars()
         }
 
+    forwarder_ids = {m.forwarded_from_id for m in messages if m.forwarded_from_id is not None}
+    forwarders_by_id: dict[uuid.UUID, User] = {}
+    if forwarder_ids:
+        forwarders_by_id = {
+            u.id: u for u in (await db.execute(select(User).where(User.id.in_(forwarder_ids)))).scalars()
+        }
+
     reactions_result = await db.execute(
         select(DirectMessageReaction).where(DirectMessageReaction.message_id.in_(message_ids))
     )
@@ -140,6 +147,9 @@ async def _serialize_messages(
                 attachment_thumbnail_url=m.attachment_thumbnail_url,
                 attachment_type=m.attachment_type.value if m.attachment_type else None,
                 reply_to=reply_preview(m),
+                forwarded_from=to_author(forwarders_by_id.get(m.forwarded_from_id))
+                if m.forwarded_from_id
+                else None,
                 reactions=reaction_summaries(m.id),
                 created_at=m.created_at,
                 read_at=m.read_at,
@@ -308,6 +318,7 @@ async def send_message(
     db: AsyncSession = Depends(get_db),
     text: str | None = Form(default=None),
     reply_to_id: uuid.UUID | None = Form(default=None),
+    forwarded_from_id: uuid.UUID | None = Form(default=None),
     attachment: UploadFile | None = File(default=None),
 ):
     target = await _get_target_user(db, username)
@@ -337,6 +348,10 @@ async def send_message(
         if original is not None and original.conversation_id == conversation.id:
             resolved_reply_to = original.id
 
+    resolved_forwarded_from: uuid.UUID | None = None
+    if forwarded_from_id is not None and await db.get(User, forwarded_from_id) is not None:
+        resolved_forwarded_from = forwarded_from_id
+
     attachment_type = None
     attachment_url = None
     attachment_thumbnail_url = None
@@ -351,6 +366,7 @@ async def send_message(
         sender_id=current_user.id,
         text=clean_text,
         reply_to_id=resolved_reply_to,
+        forwarded_from_id=resolved_forwarded_from,
         attachment_type=attachment_type,
         attachment_url=attachment_url,
         attachment_thumbnail_url=attachment_thumbnail_url,

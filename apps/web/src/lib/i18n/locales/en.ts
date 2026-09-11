@@ -152,6 +152,7 @@ const en: Dictionary = {
     attachmentUnsupported: "Only images and videos are supported",
     removeAttachment: "Remove attachment",
     forward: "Forward",
+    forwardedFrom: "Forwarded from",
     forwardTitle: "Forward message",
     forwardPlaceholder: "Forward to?",
     forwardSent: "Forwarded",

@@ -194,6 +194,7 @@ export type DirectMessage = {
   attachment_thumbnail_url: string | null;
   attachment_type: "image" | "video" | null;
   reply_to: ReplyPreview | null;
+  forwarded_from: PostAuthor | null;
   reactions: MessageReaction[];
   created_at: string;
   read_at: string | null;
