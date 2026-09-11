@@ -258,10 +258,15 @@ const uz: Dictionary = {
   admin: {
     tabs: {
       reports: "Shikoyatlar",
+      users: "Foydalanuvchilar",
       topics: "Mavzular",
       stats: "Statistika",
       audit: "Jurnal",
     },
+    usersSearchPlaceholder: "Ism, username yoki email bo‘yicha qidirish",
+    noUsers: "Foydalanuvchilar topilmadi",
+    unsuspendUser: "Cheklovni olib tashlash",
+    notVerified: "Email tasdiqlanmagan",
     statusOpen: "Ochiq",
     statusResolved: "Ko‘rib chiqilgan",
     statusAll: "Barchasi",

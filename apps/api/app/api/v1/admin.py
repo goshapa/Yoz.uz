@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import func, select, tuple_
+from sqlalchemy import func, or_, select, tuple_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import require_admin, require_staff
@@ -16,6 +16,8 @@ from app.schemas.admin import (
     AdminReportOut,
     AdminReportPage,
     AdminTopicOut,
+    AdminUserOut,
+    AdminUserPage,
     AssignRoleRequest,
     HidePostRequest,
     ModerationLogOut,
@@ -199,6 +201,54 @@ async def assign_role(
         db, admin.id, ModerationAction.assign_role, ModerationTargetType.user, target.id, f"role={payload.role.value}"
     )
     return MessageResponse(message="Роль обновлена")
+
+
+@router.get("/users", response_model=AdminUserPage)
+async def list_users(
+    q: str | None = None,
+    cursor: str | None = None,
+    limit: int = 30,
+    _staff: User = Depends(require_staff),
+    db: AsyncSession = Depends(get_db),
+):
+    limit = clamp_limit(limit)
+    query = select(User)
+    query_text = (q or "").strip()
+    if query_text:
+        query = query.where(
+            or_(
+                User.display_name.ilike(f"%{query_text}%"),
+                User.username.ilike(f"%{query_text}%"),
+                User.email.ilike(f"%{query_text}%"),
+            )
+        )
+    if cursor:
+        cursor_created_at, cursor_id = decode_cursor(cursor)
+        query = query.where(tuple_(User.created_at, User.id) < (cursor_created_at, cursor_id))
+    query = query.order_by(User.created_at.desc(), User.id.desc()).limit(limit + 1)
+
+    rows = list((await db.execute(query)).scalars())
+    has_more = len(rows) > limit
+    rows = rows[:limit]
+
+    items = [
+        AdminUserOut(
+            id=u.id,
+            display_name=u.display_name,
+            username=u.username,
+            email=u.email,
+            avatar_url=u.avatar_url,
+            role=u.role.value,
+            is_suspended=u.is_suspended,
+            suspension_reason=u.suspension_reason,
+            email_verified=u.email_verified,
+            is_founder=u.is_founder,
+            created_at=u.created_at,
+        )
+        for u in rows
+    ]
+    next_cursor = encode_cursor(rows[-1].created_at, rows[-1].id) if has_more and rows else None
+    return AdminUserPage(items=items, next_cursor=next_cursor)
 
 
 @router.get("/topics", response_model=list[AdminTopicOut])

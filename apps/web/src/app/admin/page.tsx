@@ -4,12 +4,27 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
+import { Avatar } from "@/components/Avatar";
 import { LoadingState } from "@/components/Spinner";
 import { api, type UserMe } from "@/lib/api";
 import { useI18n } from "@/lib/i18n";
 import { formatRelativeTime } from "@/lib/time";
 
 type AdminAuthor = { id: string; display_name: string; username: string; avatar_url: string | null };
+
+type AdminUser = {
+  id: string;
+  display_name: string;
+  username: string;
+  email: string;
+  avatar_url: string | null;
+  role: "user" | "moderator" | "admin";
+  is_suspended: boolean;
+  suspension_reason: string | null;
+  email_verified: boolean;
+  is_founder: boolean;
+  created_at: string;
+};
 
 type AdminReport = {
   id: string;
@@ -52,7 +67,7 @@ type LogEntry = {
   created_at: string;
 };
 
-type Tab = "reports" | "topics" | "stats" | "audit";
+type Tab = "reports" | "users" | "topics" | "stats" | "audit";
 
 const REASON_KEYS = ["spam", "abuse", "threats", "prohibited_content", "impersonation", "other"] as const;
 
@@ -185,6 +200,156 @@ function ReportsTab({ isAdmin }: { isAdmin: boolean }) {
           </div>
         </div>
       ))}
+    </div>
+  );
+}
+
+function UsersTab({ isAdmin }: { isAdmin: boolean }) {
+  const { dict, locale } = useI18n();
+  const [query, setQuery] = useState("");
+  const [users, setUsers] = useState<AdminUser[] | null>(null);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setUsers(null);
+    const timeout = setTimeout(() => {
+      const qs = query.trim() ? `?q=${encodeURIComponent(query.trim())}` : "";
+      api
+        .get<{ items: AdminUser[]; next_cursor: string | null }>(`/admin/users${qs}`)
+        .then((page) => {
+          setUsers(page.items);
+          setNextCursor(page.next_cursor);
+        })
+        .catch(() => setUsers([]));
+    }, 300);
+    return () => clearTimeout(timeout);
+  }, [query]);
+
+  async function loadMore() {
+    if (!nextCursor || loadingMore) return;
+    setLoadingMore(true);
+    try {
+      const qs = new URLSearchParams({ cursor: nextCursor });
+      if (query.trim()) qs.set("q", query.trim());
+      const page = await api.get<{ items: AdminUser[]; next_cursor: string | null }>(`/admin/users?${qs.toString()}`);
+      setUsers((current) => [...(current ?? []), ...page.items]);
+      setNextCursor(page.next_cursor);
+    } finally {
+      setLoadingMore(false);
+    }
+  }
+
+  async function toggleSuspend(u: AdminUser) {
+    setBusyId(u.id);
+    try {
+      if (u.is_suspended) {
+        await api.post(`/admin/users/${u.id}/unsuspend`);
+        setUsers((current) => current?.map((x) => (x.id === u.id ? { ...x, is_suspended: false, suspension_reason: null } : x)) ?? null);
+      } else {
+        const reason = window.prompt(dict.admin.suspendReasonPrompt);
+        if (!reason) return;
+        await api.post(`/admin/users/${u.id}/suspend`, { reason });
+        setUsers((current) => current?.map((x) => (x.id === u.id ? { ...x, is_suspended: true, suspension_reason: reason } : x)) ?? null);
+      }
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function assignRole(u: AdminUser) {
+    const role = window.prompt(dict.admin.rolePrompt, u.role);
+    if (!role) return;
+    setBusyId(u.id);
+    try {
+      await api.post(`/admin/users/${u.id}/role`, { role });
+      setUsers((current) => current?.map((x) => (x.id === u.id ? { ...x, role: role as AdminUser["role"] } : x)) ?? null);
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  return (
+    <div>
+      <div className="mx-3 mt-3">
+        <input
+          className="input"
+          placeholder={dict.admin.usersSearchPlaceholder}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+      </div>
+
+      {users === null && <LoadingState label={dict.common.loading} />}
+      {users && users.length === 0 && (
+        <div className="px-6 py-16 text-center text-sm text-[var(--fg-muted)]">{dict.admin.noUsers}</div>
+      )}
+
+      {users?.map((u) => (
+        <div key={u.id} className="card mx-3 my-2 flex items-start gap-3 px-4 py-3 text-sm">
+          <Avatar src={u.avatar_url} name={u.display_name} size={40} />
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <Link href={`/u/${u.username}`} className="font-semibold hover:underline">
+                {u.display_name}
+              </Link>
+              <span className="text-xs text-[var(--fg-muted)]">@{u.username}</span>
+              {u.role !== "user" && (
+                <span className="rounded-full bg-accent-500/15 px-2 py-0.5 text-[10px] font-semibold text-accent-600 dark:text-accent-400">
+                  {u.role}
+                </span>
+              )}
+              {u.is_suspended && (
+                <span className="rounded-full bg-red-500/15 px-2 py-0.5 text-[10px] font-semibold text-red-600">
+                  {dict.admin.statSuspended}
+                </span>
+              )}
+              {!u.email_verified && (
+                <span className="rounded-full bg-sun-500/15 px-2 py-0.5 text-[10px] font-semibold text-sun-600">
+                  {dict.admin.notVerified}
+                </span>
+              )}
+            </div>
+            <p className="mt-0.5 truncate text-xs text-[var(--fg-muted)]">{u.email}</p>
+            {u.is_suspended && u.suspension_reason && (
+              <p className="mt-0.5 text-xs text-red-600">{u.suspension_reason}</p>
+            )}
+            <p className="mt-0.5 text-xs text-[var(--fg-muted)]">
+              {dict.profile.joined} {formatRelativeTime(u.created_at, locale)}
+            </p>
+
+            <div className="mt-2 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => toggleSuspend(u)}
+                disabled={busyId === u.id}
+                className="btn-secondary-sm"
+              >
+                {u.is_suspended ? dict.admin.unsuspendUser : dict.admin.suspendUser}
+              </button>
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={() => assignRole(u)}
+                  disabled={busyId === u.id}
+                  className="btn-secondary-sm"
+                >
+                  {dict.admin.assignRole}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      ))}
+
+      {nextCursor && (
+        <div className="py-4 text-center">
+          <button type="button" onClick={loadMore} className="btn-secondary-sm" disabled={loadingMore}>
+            {loadingMore ? dict.feed.loadingMore : dict.messages.loadMore}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -356,7 +521,7 @@ export default function AdminPage() {
   }
 
   const isAdmin = user?.role === "admin";
-  const visibleTabs: Tab[] = isAdmin ? ["reports", "topics", "stats", "audit"] : ["reports"];
+  const visibleTabs: Tab[] = isAdmin ? ["reports", "users", "topics", "stats", "audit"] : ["reports", "users"];
 
   return (
     <AppShell user={user}>
@@ -381,6 +546,7 @@ export default function AdminPage() {
       </nav>
 
       {user && tab === "reports" && <ReportsTab isAdmin={isAdmin} />}
+      {user && tab === "users" && <UsersTab isAdmin={isAdmin} />}
       {user && tab === "topics" && isAdmin && <TopicsTab />}
       {user && tab === "stats" && isAdmin && <StatsTab />}
       {user && tab === "audit" && isAdmin && <AuditTab />}

@@ -256,10 +256,15 @@ const ru = {
   admin: {
     tabs: {
       reports: "Жалобы",
+      users: "Пользователи",
       topics: "Темы",
       stats: "Статистика",
       audit: "Журнал",
     },
+    usersSearchPlaceholder: "Поиск по имени, юзернейму или email",
+    noUsers: "Пользователи не найдены",
+    unsuspendUser: "Снять ограничение",
+    notVerified: "Email не подтверждён",
     statusOpen: "Открытые",
     statusResolved: "Обработанные",
     statusAll: "Все",

@@ -88,6 +88,25 @@ class AdminTopicOut(BaseModel):
     sort_order: int
 
 
+class AdminUserOut(BaseModel):
+    id: uuid.UUID
+    display_name: str
+    username: str
+    email: str
+    avatar_url: str | None
+    role: str
+    is_suspended: bool
+    suspension_reason: str | None
+    email_verified: bool
+    is_founder: bool
+    created_at: datetime
+
+
+class AdminUserPage(BaseModel):
+    items: list[AdminUserOut]
+    next_cursor: str | None
+
+
 class StatsOut(BaseModel):
     users_count: int
     posts_count: int

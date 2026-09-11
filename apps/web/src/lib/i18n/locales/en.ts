@@ -258,10 +258,15 @@ const en: Dictionary = {
   admin: {
     tabs: {
       reports: "Reports",
+      users: "Users",
       topics: "Topics",
       stats: "Stats",
       audit: "Log",
     },
+    usersSearchPlaceholder: "Search by name, username, or email",
+    noUsers: "No users found",
+    unsuspendUser: "Lift restriction",
+    notVerified: "Email not verified",
     statusOpen: "Open",
     statusResolved: "Resolved",
     statusAll: "All",
