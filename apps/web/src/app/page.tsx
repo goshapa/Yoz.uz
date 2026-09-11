@@ -52,7 +52,10 @@ export default function HomePage() {
           <span className="text-gradient text-xl font-extrabold tracking-tight">{dict.common.appName}</span>
         </span>
         <div className="flex flex-wrap items-center justify-end gap-2">
-          <SettingsMenu />
+          {/* Когда рядом есть кнопки входа, шестерёнка стоит левее и меню открывается вправо.
+              Когда пользователь залогинен, шестерёнка одна прижата к правому краю экрана —
+              там меню нужно открывать влево, иначе оно вылезает за пределы экрана. */}
+          <SettingsMenu align={checkedAuth && !user ? "left" : "right"} />
           {checkedAuth && !user && (
             <>
               <Link href="/login" className="btn-secondary-sm">
