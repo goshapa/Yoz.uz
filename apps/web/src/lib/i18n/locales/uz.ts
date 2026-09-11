@@ -151,6 +151,10 @@ const uz: Dictionary = {
     attachmentTooBig: "Fayl juda katta",
     attachmentUnsupported: "Faqat rasm va video qo‘llab-quvvatlanadi",
     removeAttachment: "Biriktirilganini olib tashlash",
+    forward: "Yuborish",
+    forwardTitle: "Xabarni yuborish",
+    forwardPlaceholder: "Kimga yuborilsin?",
+    forwardSent: "Yuborildi",
   },
   settings: {
     title: "Profil sozlamalari",

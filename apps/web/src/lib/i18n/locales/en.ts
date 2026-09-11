@@ -151,6 +151,10 @@ const en: Dictionary = {
     attachmentTooBig: "File is too large",
     attachmentUnsupported: "Only images and videos are supported",
     removeAttachment: "Remove attachment",
+    forward: "Forward",
+    forwardTitle: "Forward message",
+    forwardPlaceholder: "Forward to?",
+    forwardSent: "Forwarded",
   },
   settings: {
     title: "Profile settings",

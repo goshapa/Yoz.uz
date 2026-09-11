@@ -27,7 +27,8 @@ export type IconName =
   | "smile"
   | "paperclip"
   | "x"
-  | "play";
+  | "play"
+  | "forward";
 
 const ICON_PATHS: Record<IconName, ReactNode> = {
   reply: (
@@ -160,6 +161,12 @@ const ICON_PATHS: Record<IconName, ReactNode> = {
     </>
   ),
   play: <polygon points="5 3 19 12 5 21 5 3" />,
+  forward: (
+    <>
+      <polyline points="15 10 20 15 15 20" />
+      <path d="M4 4v7a4 4 0 0 0 4 4h12" />
+    </>
+  ),
 };
 
 export function Icon({

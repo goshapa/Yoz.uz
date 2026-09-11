@@ -10,7 +10,15 @@ import { DirectMessageBubble } from "@/components/DirectMessageBubble";
 import { FounderBadge } from "@/components/FounderBadge";
 import { Icon } from "@/components/icons";
 import { LoadingState, Spinner } from "@/components/Spinner";
-import { api, ApiError, type DirectMessage, type DirectMessagePage, type Profile, type UserMe } from "@/lib/api";
+import {
+  api,
+  ApiError,
+  type DirectMessage,
+  type DirectMessagePage,
+  type Profile,
+  type SearchUser,
+  type UserMe,
+} from "@/lib/api";
 import { useI18n } from "@/lib/i18n";
 import { useLockBodyScroll } from "@/lib/useLockBodyScroll";
 
@@ -42,10 +50,17 @@ export default function ConversationPage() {
   const [error, setError] = useState<string | null>(null);
   const [replyTo, setReplyTo] = useState<DirectMessage | null>(null);
   const [attachment, setAttachment] = useState<AttachmentDraft | null>(null);
-  const [reactionMenuFor, setReactionMenuFor] = useState<string | null>(null);
+  const [actionMenuFor, setActionMenuFor] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
   const [confirmingDeleteChat, setConfirmingDeleteChat] = useState(false);
+
+  const [forwardMessage, setForwardMessage] = useState<DirectMessage | null>(null);
+  const [forwardQuery, setForwardQuery] = useState("");
+  const [forwardResults, setForwardResults] = useState<SearchUser[] | null>(null);
+  const [forwardSearching, setForwardSearching] = useState(false);
+  const [forwardSendingTo, setForwardSendingTo] = useState<string | null>(null);
+  const [forwardStatus, setForwardStatus] = useState<string | null>(null);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const latestIdRef = useRef<string | null>(null);
@@ -123,6 +138,60 @@ export default function ConversationPage() {
     return () => clearInterval(interval);
   }, [viewer, loadLatest]);
 
+  useEffect(() => {
+    if (!actionMenuFor) return;
+    function handlePointerDown(e: PointerEvent) {
+      const target = e.target as HTMLElement;
+      if (!target.closest("[data-message-menu]")) setActionMenuFor(null);
+    }
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [actionMenuFor]);
+
+  useEffect(() => {
+    if (!forwardMessage) {
+      setForwardQuery("");
+      setForwardResults(null);
+      return;
+    }
+    const trimmed = forwardQuery.trim();
+    if (!trimmed) {
+      setForwardResults(null);
+      return;
+    }
+    const timeout = setTimeout(() => {
+      setForwardSearching(true);
+      api
+        .get<{ users: SearchUser[] }>(`/search?q=${encodeURIComponent(trimmed)}`)
+        .then((res) => setForwardResults(res.users.filter((u) => u.username !== viewer?.username)))
+        .catch(() => setForwardResults([]))
+        .finally(() => setForwardSearching(false));
+    }, 300);
+    return () => clearTimeout(timeout);
+  }, [forwardMessage, forwardQuery, viewer?.username]);
+
+  async function sendForward(target: SearchUser) {
+    if (!forwardMessage || forwardSendingTo) return;
+    setForwardSendingTo(target.username);
+    try {
+      const formData = new FormData();
+      if (forwardMessage.text) formData.append("text", forwardMessage.text);
+      if (forwardMessage.attachment_url) {
+        const blob = await fetch(forwardMessage.attachment_url).then((r) => r.blob());
+        const ext = forwardMessage.attachment_type === "video" ? "mp4" : "jpg";
+        formData.append("attachment", new File([blob], `forwarded.${ext}`, { type: blob.type }));
+      }
+      await api.postForm(`/messages/${target.username}`, formData);
+      setForwardMessage(null);
+      setForwardStatus(`${dict.messages.forwardSent} · ${target.display_name}`);
+      setTimeout(() => setForwardStatus(null), 2500);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : dict.errors.generic);
+    } finally {
+      setForwardSendingTo(null);
+    }
+  }
+
   async function loadOlder() {
     if (!nextCursor || loadingMore) return;
     setLoadingMore(true);
@@ -190,6 +259,7 @@ export default function ConversationPage() {
   }
 
   function startEdit(message: DirectMessage) {
+    setActionMenuFor(null);
     setReplyTo(null);
     setEditingId(message.id);
     setEditText(message.text ?? "");
@@ -210,6 +280,7 @@ export default function ConversationPage() {
   }
 
   async function handleDeleteMessage(message: DirectMessage) {
+    setActionMenuFor(null);
     try {
       await api.del(`/messages/${username}/${message.id}`);
       setItems(
@@ -226,7 +297,7 @@ export default function ConversationPage() {
   }
 
   async function toggleReaction(message: DirectMessage, emoji: string) {
-    setReactionMenuFor(null);
+    setActionMenuFor(null);
     const mine = message.reactions.find((r) => r.reacted_by_viewer);
     try {
       const updated =
@@ -323,12 +394,16 @@ export default function ConversationPage() {
                         viewerName={viewer.display_name}
                         peerName={peer.display_name}
                         dict={dict}
-                        reactionMenuOpen={reactionMenuFor === m.id}
-                        onToggleReactionMenu={() => setReactionMenuFor((c) => (c === m.id ? null : m.id))}
+                        menuOpen={actionMenuFor === m.id}
+                        onOpenMenu={() => setActionMenuFor(m.id)}
                         onReact={(emoji) => toggleReaction(m, emoji)}
                         onReply={() => {
                           setEditingId(null);
                           setReplyTo(m);
+                        }}
+                        onForward={() => {
+                          setActionMenuFor(null);
+                          setForwardMessage(m);
                         }}
                         onEdit={() => startEdit(m)}
                         onDelete={() => handleDeleteMessage(m)}
@@ -436,6 +511,64 @@ export default function ConversationPage() {
           </>
         )}
       </div>
+
+      {forwardMessage && (
+        <div
+          className="fixed inset-0 z-30 flex items-end justify-center bg-black/40 md:items-center"
+          onClick={() => setForwardMessage(null)}
+        >
+          <div
+            className="flex max-h-[70vh] w-full max-w-sm flex-col rounded-t-2xl bg-[var(--bg)] p-4 shadow-xl md:rounded-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="font-semibold">{dict.messages.forwardTitle}</h2>
+              <button type="button" onClick={() => setForwardMessage(null)} aria-label={dict.messages.editCancel}>
+                <Icon name="x" size={18} />
+              </button>
+            </div>
+            <input
+              className="input mb-3"
+              placeholder={dict.messages.forwardPlaceholder}
+              value={forwardQuery}
+              onChange={(e) => setForwardQuery(e.target.value)}
+              autoFocus
+            />
+            <div className="flex-1 overflow-y-auto">
+              {forwardSearching && <LoadingState label={dict.common.loading} />}
+              {!forwardSearching && forwardQuery.trim() && forwardResults && forwardResults.length === 0 && (
+                <p className="px-2 py-8 text-center text-sm text-[var(--fg-muted)]">{dict.messages.searchNoResults}</p>
+              )}
+              {!forwardSearching &&
+                forwardResults?.map((u) => (
+                  <button
+                    key={u.id}
+                    type="button"
+                    onClick={() => sendForward(u)}
+                    disabled={forwardSendingTo !== null}
+                    className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left hover:bg-black/5 disabled:opacity-50 dark:hover:bg-white/10"
+                  >
+                    <Avatar src={u.avatar_url} name={u.display_name} />
+                    <div className="min-w-0 flex-1">
+                      <p className="flex items-center gap-1 truncate text-sm font-semibold">
+                        {u.display_name}
+                        {u.is_founder && <FounderBadge size={9} />}
+                      </p>
+                      <p className="truncate text-xs text-[var(--fg-muted)]">@{u.username}</p>
+                    </div>
+                    {forwardSendingTo === u.username && <Spinner size={16} />}
+                  </button>
+                ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {forwardStatus && (
+        <div className="fixed bottom-20 left-1/2 z-40 -translate-x-1/2 rounded-full bg-[var(--fg)] px-4 py-2 text-sm text-[var(--bg)] shadow-lg md:bottom-6">
+          {forwardStatus}
+        </div>
+      )}
     </AppShell>
   );
 }

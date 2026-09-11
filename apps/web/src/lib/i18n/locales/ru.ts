@@ -149,6 +149,10 @@ const ru = {
     attachmentTooBig: "Файл слишком большой",
     attachmentUnsupported: "Поддерживаются только изображения и видео",
     removeAttachment: "Убрать вложение",
+    forward: "Переслать",
+    forwardTitle: "Переслать сообщение",
+    forwardPlaceholder: "Кому переслать?",
+    forwardSent: "Переслано",
   },
   settings: {
     title: "Настройки профиля",
