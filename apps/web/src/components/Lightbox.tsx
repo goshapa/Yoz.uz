@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { Icon } from "@/components/icons";
 
@@ -36,13 +37,20 @@ export function Lightbox({
     };
   }, []);
 
+  // Рендерим через портал в body: иначе fixed-позиционирование ломается,
+  // если у родителя (например, карточки поста с hover:-translate-y) есть transform —
+  // он становится containing block для fixed-потомков, и лайтбокс "прилипает" к посту
+  // вместо всего экрана.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const item = items[index];
-  if (!item) return null;
+  if (!item || !mounted) return null;
 
   const hasPrev = index > 0;
   const hasNext = index < items.length - 1;
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
       onClick={onClose}
@@ -102,6 +110,7 @@ export function Lightbox({
           <video src={item.url} controls autoPlay className="max-h-[90vh] max-w-[95vw] rounded-lg" />
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
