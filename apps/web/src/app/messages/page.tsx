@@ -115,7 +115,7 @@ export default function MessagesPage() {
 
   return (
     <AppShell user={user}>
-      <header className="sticky top-0 z-10 space-y-2 bg-[var(--bg)]/95 px-4 py-3 backdrop-blur">
+      <header className="sticky top-[env(safe-area-inset-top)] z-10 space-y-2 bg-[var(--bg)]/95 px-4 py-3 backdrop-blur">
         <div className="flex items-center justify-between">
           <h1 className="font-medium">{dict.messages.title}</h1>
           {user && (

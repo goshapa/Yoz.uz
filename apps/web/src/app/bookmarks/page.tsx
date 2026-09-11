@@ -22,7 +22,7 @@ export default function BookmarksPage() {
 
   return (
     <AppShell user={user}>
-      <header className="sticky top-0 z-10 bg-[var(--bg)]/95 px-4 py-3 backdrop-blur">
+      <header className="sticky top-[env(safe-area-inset-top)] z-10 bg-[var(--bg)]/95 px-4 py-3 backdrop-blur">
         <h1 className="font-medium">{dict.bookmarks.title}</h1>
       </header>
       <div className="border-b border-[var(--border)]" />

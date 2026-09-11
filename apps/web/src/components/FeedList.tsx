@@ -142,7 +142,7 @@ export function FeedList({
   return (
     <div>
       {hasNewer && (
-        <div className="sticky top-0 z-10 flex justify-center py-2">
+        <div className="sticky top-[env(safe-area-inset-top)] z-10 flex justify-center py-2">
           <button
             type="button"
             onClick={showNewer}

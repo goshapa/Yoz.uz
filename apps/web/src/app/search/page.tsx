@@ -62,7 +62,7 @@ export default function SearchPage() {
 
   return (
     <AppShell user={viewer}>
-      <div className="sticky top-0 z-10 space-y-2 bg-[var(--bg)]/95 px-4 py-3 backdrop-blur">
+      <div className="sticky top-[env(safe-area-inset-top)] z-10 space-y-2 bg-[var(--bg)]/95 px-4 py-3 backdrop-blur">
         <input
           className="input"
           placeholder={dict.search.placeholder}

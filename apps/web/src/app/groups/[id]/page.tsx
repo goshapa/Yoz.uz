@@ -243,7 +243,7 @@ export default function GroupChatPage() {
   return (
     <AppShell user={viewer}>
       <div className="fixed inset-0 z-20 flex flex-col overscroll-none bg-[var(--bg)] md:static md:inset-auto md:z-auto md:h-[100dvh]">
-        <header className="flex shrink-0 items-center gap-3 border-b border-[var(--border)] bg-[var(--bg)]/95 px-4 py-3 backdrop-blur">
+        <header className="flex shrink-0 items-center gap-3 border-b border-[var(--border)] bg-[var(--bg)]/95 px-4 py-3 pt-[calc(0.75rem+env(safe-area-inset-top))] backdrop-blur">
           <Link href="/messages" className="btn-secondary-sm shrink-0" aria-label={dict.postDetail.back}>
             ←
           </Link>
@@ -313,7 +313,7 @@ export default function GroupChatPage() {
               )}
             </div>
 
-            <div className="shrink-0 border-t border-[var(--border)] bg-[var(--bg)]/95 backdrop-blur">
+            <div className="shrink-0 border-t border-[var(--border)] bg-[var(--bg)]/95 pb-[env(safe-area-inset-bottom)] backdrop-blur">
               <form onSubmit={handleSend} className="flex flex-col gap-2 p-3">
                 {attachment && (
                   <div className="relative inline-block w-fit">

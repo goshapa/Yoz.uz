@@ -89,7 +89,7 @@ export default function NotificationsPage() {
 
   return (
     <AppShell user={user}>
-      <header className="sticky top-0 z-10 flex items-center justify-between bg-[var(--bg)]/95 px-4 py-3 backdrop-blur">
+      <header className="sticky top-[env(safe-area-inset-top)] z-10 flex items-center justify-between bg-[var(--bg)]/95 px-4 py-3 backdrop-blur">
         <h1 className="font-medium">{dict.notifications.title}</h1>
         {items && items.length > 0 && (
           <button type="button" onClick={markAllRead} className="btn-secondary-sm">

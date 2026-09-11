@@ -46,7 +46,7 @@ export default function HomePage() {
 
   return (
     <AppShell user={user} onPostCreated={setInjectedPost}>
-      <header className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-y-2 bg-[var(--bg)]/95 px-4 py-3 backdrop-blur md:hidden">
+      <header className="sticky top-[env(safe-area-inset-top)] z-10 flex flex-wrap items-center justify-between gap-y-2 bg-[var(--bg)]/95 px-4 py-3 backdrop-blur md:hidden">
         <span className="flex items-center gap-2">
           <span className="logo-mark h-7 w-7 text-sm">Y</span>
           <span className="text-gradient text-xl font-extrabold tracking-tight">{dict.common.appName}</span>

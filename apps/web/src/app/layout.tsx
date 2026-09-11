@@ -30,6 +30,9 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: "#0f867e",
+  // Позволяет странице занять весь экран за скруглёнными углами/чёлкой/индикатором
+  // Home в standalone-режиме на iOS — без этого env(safe-area-inset-*) всегда равен 0.
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

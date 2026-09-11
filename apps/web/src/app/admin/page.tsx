@@ -525,7 +525,7 @@ export default function AdminPage() {
 
   return (
     <AppShell user={user}>
-      <header className="sticky top-0 z-10 bg-[var(--bg)]/95 px-4 py-3 backdrop-blur">
+      <header className="sticky top-[env(safe-area-inset-top)] z-10 bg-[var(--bg)]/95 px-4 py-3 backdrop-blur">
         <h1 className="font-medium">{dict.nav.admin}</h1>
       </header>
       <nav className="mx-3 mt-3 flex flex-wrap gap-1 rounded-lg border-[1.5px] border-[var(--border)] bg-[var(--bg-elevated)] p-1 shadow-sm">

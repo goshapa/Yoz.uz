@@ -72,7 +72,7 @@ export default function PostDetailPage() {
 
   return (
     <AppShell user={user}>
-      <header className="sticky top-0 z-10 flex items-center gap-3 bg-[var(--bg)]/95 px-4 py-3 backdrop-blur">
+      <header className="sticky top-[env(safe-area-inset-top)] z-10 flex items-center gap-3 bg-[var(--bg)]/95 px-4 py-3 backdrop-blur">
         <button
           type="button"
           onClick={() => router.back()}

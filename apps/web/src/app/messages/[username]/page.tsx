@@ -273,7 +273,7 @@ export default function ConversationPage() {
       {/* fixed на мобильном — страница жёстко привязана к вьюпорту, её нельзя утянуть
           вместе со всем интерфейсом; на десктопе остаётся обычным блоком в колонке. */}
       <div className="fixed inset-0 z-20 flex flex-col overscroll-none bg-[var(--bg)] md:static md:inset-auto md:z-auto md:h-[100dvh]">
-        <header className="flex shrink-0 items-center gap-3 border-b border-[var(--border)] bg-[var(--bg)]/95 px-4 py-3 backdrop-blur">
+        <header className="flex shrink-0 items-center gap-3 border-b border-[var(--border)] bg-[var(--bg)]/95 px-4 py-3 pt-[calc(0.75rem+env(safe-area-inset-top))] backdrop-blur">
           <Link href="/messages" className="btn-secondary-sm shrink-0" aria-label={dict.postDetail.back}>
             ←
           </Link>
@@ -368,7 +368,7 @@ export default function ConversationPage() {
               {blocked ? (
                 <p className="w-full py-3 text-center text-sm text-[var(--fg-muted)]">{dict.messages.blockedNotice}</p>
               ) : (
-                <form onSubmit={handleSend} className="flex flex-col gap-2 p-3">
+                <form onSubmit={handleSend} className="flex flex-col gap-2 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
                   {replyTo && (
                     <div className="flex items-center justify-between rounded-lg bg-[var(--bg-elevated)] px-3 py-1.5 text-xs">
                       <p className="min-w-0 truncate text-[var(--fg-muted)]">

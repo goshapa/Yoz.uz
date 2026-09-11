@@ -161,7 +161,7 @@ export default function GroupSettingsPage() {
 
   return (
     <AppShell user={viewer}>
-      <header className="sticky top-0 z-10 flex items-center gap-3 bg-[var(--bg)]/95 px-4 py-3 backdrop-blur">
+      <header className="sticky top-[env(safe-area-inset-top)] z-10 flex items-center gap-3 bg-[var(--bg)]/95 px-4 py-3 backdrop-blur">
         <Link href={`/groups/${groupId}`} className="btn-secondary-sm shrink-0" aria-label={dict.groups.back}>
           ←
         </Link>

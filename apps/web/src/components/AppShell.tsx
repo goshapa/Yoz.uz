@@ -139,8 +139,8 @@ export function AppShell({
       </aside>
 
       <div
-        className={`flex min-h-screen w-full flex-1 flex-col md:max-w-2xl md:pb-0 ${
-          isConversationView ? "pb-0" : "pb-16"
+        className={`flex min-h-screen w-full flex-1 flex-col pt-[env(safe-area-inset-top)] md:max-w-2xl md:pb-0 md:pt-0 ${
+          isConversationView ? "pb-0" : "pb-[calc(4rem+env(safe-area-inset-bottom))]"
         }`}
       >
         {children}
@@ -151,7 +151,7 @@ export function AppShell({
       </aside>
 
       {!isConversationView && (
-        <nav className="fixed inset-x-0 bottom-0 z-20 flex border-t border-[var(--border)] bg-[var(--bg-elevated)] md:hidden">
+        <nav className="fixed inset-x-0 bottom-0 z-20 flex border-t border-[var(--border)] bg-[var(--bg-elevated)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] md:hidden">
           {navItems.map((item) => (
             <Link
               key={item.href}
@@ -176,7 +176,7 @@ export function AppShell({
         <button
           type="button"
           onClick={() => setComposerOpen(true)}
-          className="btn-primary fixed bottom-16 right-4 z-20 flex h-14 w-14 items-center justify-center rounded-full text-2xl leading-none shadow-lg md:hidden"
+          className="btn-primary fixed bottom-[calc(4rem+env(safe-area-inset-bottom))] right-[calc(1rem+env(safe-area-inset-right))] z-20 flex h-14 w-14 items-center justify-center rounded-full text-2xl leading-none shadow-lg md:hidden"
           aria-label={dict.composer.submit}
         >
           +
