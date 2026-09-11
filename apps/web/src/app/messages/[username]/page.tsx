@@ -398,6 +398,7 @@ export default function ConversationPage() {
                         onOpenMenu={() => setActionMenuFor(m.id)}
                         onReact={(emoji) => toggleReaction(m, emoji)}
                         onReply={() => {
+                          setActionMenuFor(null);
                           setEditingId(null);
                           setReplyTo(m);
                         }}

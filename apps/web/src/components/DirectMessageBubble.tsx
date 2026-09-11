@@ -9,8 +9,6 @@ import { formatClockTime } from "@/lib/time";
 
 export const REACTION_EMOJIS = ["👍", "❤️", "😂", "😮", "😢", "🙏", "🔥", "👏"];
 
-const SWIPE_TRIGGER_PX = 56;
-const SWIPE_MAX_PX = 72;
 const LONG_PRESS_MS = 450;
 const MOVE_CANCEL_PX = 8;
 
@@ -54,8 +52,6 @@ export function DirectMessageBubble({
   onCancelEdit: () => void;
 }) {
   const [confirmingDelete, setConfirmingDelete] = useState(false);
-  const [dragX, setDragX] = useState(0);
-  const [dragging, setDragging] = useState(false);
 
   const startRef = useRef({ x: 0, y: 0 });
   const movedRef = useRef(false);
@@ -100,53 +96,28 @@ export function DirectMessageBubble({
       movedRef.current = true;
       clearLongPress();
     }
-    if (Math.abs(dx) > Math.abs(dy) && dx > 0) {
-      setDragging(true);
-      setDragX(Math.min(dx, SWIPE_MAX_PX));
-    }
   }
 
   function handlePointerUp() {
     clearLongPress();
-    if (dragX > SWIPE_TRIGGER_PX) onReply();
-    setDragging(false);
-    setDragX(0);
   }
 
   function handlePointerCancel() {
     clearLongPress();
-    setDragging(false);
-    setDragX(0);
   }
 
   return (
     <div className={`flex flex-col ${mine ? "items-end" : "items-start"}`}>
-      <div className={`flex items-center ${mine ? "justify-end" : "justify-start"}`}>
-        <div
-          className="flex shrink-0 items-center justify-center overflow-hidden text-accent-600"
-          style={{
-            width: Math.min(dragX, 32),
-            opacity: Math.min(dragX / 28, 1),
-            transition: dragging ? "none" : "width 0.15s ease, opacity 0.15s ease",
-          }}
-        >
-          <Icon name="reply" size={16} />
-        </div>
-
-        <div
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerCancel={handlePointerCancel}
-          style={{
-            transform: dragX ? `translateX(${dragX}px)` : undefined,
-            transition: dragging ? "none" : "transform 0.2s ease",
-            touchAction: "pan-y",
-          }}
-          className={`relative max-w-[75%] select-none rounded-2xl px-3.5 py-2 text-sm ${
-            mine ? "rounded-br-sm bg-accent-600 text-white" : "rounded-bl-sm bg-[var(--bg-elevated)] text-[var(--fg)]"
-          }`}
-        >
+      <div
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerCancel}
+        onContextMenu={(e) => e.preventDefault()}
+        className={`relative max-w-[75%] select-none rounded-2xl px-3.5 py-2 text-sm ${
+          mine ? "rounded-br-sm bg-accent-600 text-white" : "rounded-bl-sm bg-[var(--bg-elevated)] text-[var(--fg)]"
+        }`}
+      >
           {message.reply_to && (
             <div
               className={`mb-1.5 rounded-lg border-l-2 px-2 py-1 text-xs ${
@@ -231,7 +202,6 @@ export function DirectMessageBubble({
               ))}
             </div>
           )}
-        </div>
       </div>
 
       {menuOpen && !editing && (
@@ -254,6 +224,14 @@ export function DirectMessageBubble({
             ))}
           </div>
           <div className="pt-1">
+            <button
+              type="button"
+              onClick={onReply}
+              className="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left text-sm hover:bg-black/5 dark:hover:bg-white/10"
+            >
+              <Icon name="reply" size={16} />
+              {dict.messages.reply}
+            </button>
             <button
               type="button"
               onClick={onForward}
