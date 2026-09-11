@@ -55,7 +55,7 @@ const uz: Dictionary = {
   },
   feed: {
     tabFollowing: "Obunalar",
-    tabOverview: "Umumiy",
+    tabOverview: "Tavsiyalar",
     emptyFollowing: "Bu yerda hali hech narsa yo‘q. Obuna bo‘lmoqchi bo‘lgan odamlarni toping.",
     emptyOverview: "Hozircha postlar yo‘q.",
     findUsers: "Foydalanuvchilarni topish",

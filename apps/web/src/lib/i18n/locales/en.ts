@@ -55,7 +55,7 @@ const en: Dictionary = {
   },
   feed: {
     tabFollowing: "Following",
-    tabOverview: "Overview",
+    tabOverview: "Recommended",
     emptyFollowing: "Nothing here yet. Find people to follow.",
     emptyOverview: "No posts yet.",
     findUsers: "Find people",

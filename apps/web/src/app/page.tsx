@@ -18,7 +18,6 @@ export default function HomePage() {
   const [checkedAuth, setCheckedAuth] = useState(false);
   const [topics, setTopics] = useState<Topic[]>([]);
   const [topicFilter, setTopicFilter] = useState("");
-  const [cityFilter, setCityFilter] = useState("");
   const [injectedPost, setInjectedPost] = useState<Post | null>(null);
 
   useEffect(() => {
@@ -40,7 +39,6 @@ export default function HomePage() {
   const overviewEndpoint = (() => {
     const params = new URLSearchParams();
     if (topicFilter) params.set("topic", topicFilter);
-    if (cityFilter.trim()) params.set("city", cityFilter.trim());
     const qs = params.toString();
     return `/feed/overview${qs ? `?${qs}` : ""}`;
   })();
@@ -129,12 +127,6 @@ export default function HomePage() {
                 </option>
               ))}
             </select>
-            <input
-              className="input w-auto text-base sm:text-xs"
-              placeholder={dict.feed.cityPlaceholder}
-              value={cityFilter}
-              onChange={(e) => setCityFilter(e.target.value)}
-            />
           </div>
           <FeedList
             key={overviewEndpoint}

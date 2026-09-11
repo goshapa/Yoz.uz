@@ -53,7 +53,7 @@ const ru = {
   },
   feed: {
     tabFollowing: "Подписки",
-    tabOverview: "Обзор",
+    tabOverview: "Рекомендации",
     emptyFollowing: "Здесь пока пусто. Найдите людей, на которых хотите подписаться.",
     emptyOverview: "Публикаций пока нет.",
     findUsers: "Найти пользователей",
