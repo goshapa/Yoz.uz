@@ -128,6 +128,11 @@ export type Post = {
   reposted_at: string | null;
 };
 
+export type FollowListPage = {
+  items: PostAuthor[];
+  next_cursor: string | null;
+};
+
 export type FeedPage = {
   items: Post[];
   next_cursor: string | null;

@@ -122,6 +122,11 @@ const uz: Dictionary = {
     empty: "Bu yerda hali hech narsa yo‘q.",
     notFound: "Foydalanuvchi topilmadi",
     message: "Xabar yozish",
+    followersTitle: "Obunachilar",
+    followingTitle: "Obunalar",
+    onlyOwnerCanView: "Bu ro‘yxat faqat akkaunt egasiga ko‘rinadi",
+    emptyFollowers: "Hozircha obunachilar yo‘q",
+    emptyFollowing: "Hozircha obunalar yo‘q",
   },
   messages: {
     title: "Chat",

@@ -15,13 +15,13 @@ from app.models.post_image import PostImage
 from app.models.user import User
 from app.schemas.auth import MessageResponse
 from app.schemas.post import FeedPage
-from app.schemas.user import DeleteAccountRequest, ProfileOut, UserMe
+from app.schemas.user import DeleteAccountRequest, FollowListPage, ProfileOut, UserMe
 from app.services.activity_feed import paginate_activity
 from app.services.blocks import is_blocked
 from app.services.images import process_upload
 from app.services.notifications import notify
 from app.services.pagination import clamp_limit, decode_cursor, encode_cursor
-from app.services.post_serializer import serialize_posts
+from app.services.post_serializer import serialize_posts, to_author
 from app.services.storage import upload_object
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -168,6 +168,72 @@ async def get_profile(
         ).scalar_one_or_none() is not None
 
     return _profile_out(user, followers_count, following_count, is_following, is_self, is_blocked_by_viewer)
+
+
+@router.get("/{username}/followers", response_model=FollowListPage)
+async def list_followers(
+    username: str,
+    cursor: str | None = None,
+    limit: int = 20,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Список подписчиков виден только владельцу аккаунта — приватность по ТЗ."""
+    target = await _get_profile_user(db, username)
+    if current_user.id != target.id:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Список подписчиков виден только владельцу аккаунта")
+    limit = clamp_limit(limit)
+
+    query = (
+        select(User, Follow.created_at)
+        .join(Follow, Follow.follower_id == User.id)
+        .where(Follow.followee_id == target.id)
+    )
+    if cursor:
+        cursor_at, cursor_id = decode_cursor(cursor)
+        query = query.where(tuple_(Follow.created_at, Follow.follower_id) < (cursor_at, cursor_id))
+    query = query.order_by(Follow.created_at.desc(), Follow.follower_id.desc()).limit(limit + 1)
+
+    rows = (await db.execute(query)).all()
+    has_more = len(rows) > limit
+    rows = rows[:limit]
+
+    items = [to_author(u) for u, _ in rows]
+    next_cursor = encode_cursor(rows[-1][1], rows[-1][0].id) if has_more and rows else None
+    return FollowListPage(items=items, next_cursor=next_cursor)
+
+
+@router.get("/{username}/following", response_model=FollowListPage)
+async def list_following(
+    username: str,
+    cursor: str | None = None,
+    limit: int = 20,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Список подписок виден только владельцу аккаунта — приватность по ТЗ."""
+    target = await _get_profile_user(db, username)
+    if current_user.id != target.id:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Список подписок виден только владельцу аккаунта")
+    limit = clamp_limit(limit)
+
+    query = (
+        select(User, Follow.created_at)
+        .join(Follow, Follow.followee_id == User.id)
+        .where(Follow.follower_id == target.id)
+    )
+    if cursor:
+        cursor_at, cursor_id = decode_cursor(cursor)
+        query = query.where(tuple_(Follow.created_at, Follow.followee_id) < (cursor_at, cursor_id))
+    query = query.order_by(Follow.created_at.desc(), Follow.followee_id.desc()).limit(limit + 1)
+
+    rows = (await db.execute(query)).all()
+    has_more = len(rows) > limit
+    rows = rows[:limit]
+
+    items = [to_author(u) for u, _ in rows]
+    next_cursor = encode_cursor(rows[-1][1], rows[-1][0].id) if has_more and rows else None
+    return FollowListPage(items=items, next_cursor=next_cursor)
 
 
 @router.post("/{username}/follow", response_model=MessageResponse)

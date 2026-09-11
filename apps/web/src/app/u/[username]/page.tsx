@@ -198,14 +198,29 @@ export default function ProfilePage() {
             </div>
 
             <div className="mt-2 flex gap-4 text-sm">
-              <span>
-                <strong>{profile.following_count}</strong>{" "}
-                <span className="text-[var(--fg-muted)]">{dict.profile.following}</span>
-              </span>
-              <span>
-                <strong>{profile.followers_count}</strong>{" "}
-                <span className="text-[var(--fg-muted)]">{dict.profile.followers}</span>
-              </span>
+              {profile.is_self ? (
+                <>
+                  <Link href={`/u/${username}/following`} className="hover:underline">
+                    <strong>{profile.following_count}</strong>{" "}
+                    <span className="text-[var(--fg-muted)]">{dict.profile.following}</span>
+                  </Link>
+                  <Link href={`/u/${username}/followers`} className="hover:underline">
+                    <strong>{profile.followers_count}</strong>{" "}
+                    <span className="text-[var(--fg-muted)]">{dict.profile.followers}</span>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <span>
+                    <strong>{profile.following_count}</strong>{" "}
+                    <span className="text-[var(--fg-muted)]">{dict.profile.following}</span>
+                  </span>
+                  <span>
+                    <strong>{profile.followers_count}</strong>{" "}
+                    <span className="text-[var(--fg-muted)]">{dict.profile.followers}</span>
+                  </span>
+                </>
+              )}
             </div>
           </div>
 

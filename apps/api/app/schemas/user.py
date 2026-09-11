@@ -4,6 +4,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, EmailStr, field_validator
 
+from app.schemas.post import PostAuthor
+
 USERNAME_RE = re.compile(r"^[a-zA-Z0-9_]{3,20}$")
 
 
@@ -35,6 +37,11 @@ class ProfileOut(UserPublic):
     is_following: bool
     is_self: bool
     is_blocked_by_viewer: bool = False
+
+
+class FollowListPage(BaseModel):
+    items: list[PostAuthor]
+    next_cursor: str | None
 
 
 class DeleteAccountRequest(BaseModel):

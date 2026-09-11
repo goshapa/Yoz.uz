@@ -120,6 +120,11 @@ const ru = {
     empty: "Здесь пока ничего нет.",
     notFound: "Пользователь не найден",
     message: "Написать",
+    followersTitle: "Подписчики",
+    followingTitle: "Подписки",
+    onlyOwnerCanView: "Список виден только владельцу аккаунта",
+    emptyFollowers: "Пока нет подписчиков",
+    emptyFollowing: "Пока нет подписок",
   },
   messages: {
     title: "Чат",

@@ -122,6 +122,11 @@ const en: Dictionary = {
     empty: "Nothing here yet.",
     notFound: "User not found",
     message: "Message",
+    followersTitle: "Followers",
+    followingTitle: "Following",
+    onlyOwnerCanView: "This list is only visible to the account owner",
+    emptyFollowers: "No followers yet",
+    emptyFollowing: "Not following anyone yet",
   },
   messages: {
     title: "Chat",
