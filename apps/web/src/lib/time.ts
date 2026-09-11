@@ -6,6 +6,13 @@ const INTL_LOCALE: Record<Locale, string> = {
   en: "en-US",
 };
 
+export function formatClockTime(iso: string): string {
+  const date = new Date(iso);
+  const hours = date.getHours().toString().padStart(2, "0");
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  return `${hours}:${minutes}`;
+}
+
 export function formatRelativeTime(iso: string, locale: Locale): string {
   const date = new Date(iso);
   const diffSec = Math.floor((Date.now() - date.getTime()) / 1000);

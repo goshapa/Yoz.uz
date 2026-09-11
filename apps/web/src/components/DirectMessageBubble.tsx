@@ -4,9 +4,8 @@ import { useState } from "react";
 
 import { Icon } from "@/components/icons";
 import type { DirectMessage } from "@/lib/api";
-import type { Locale } from "@/lib/i18n";
 import type { Dictionary } from "@/lib/i18n/locales/ru";
-import { formatRelativeTime } from "@/lib/time";
+import { formatClockTime } from "@/lib/time";
 
 export const REACTION_EMOJIS = ["👍", "❤️", "😂", "😮", "😢", "🙏", "🔥", "👏"];
 
@@ -16,7 +15,6 @@ export function DirectMessageBubble({
   viewerId,
   peerName,
   viewerName,
-  locale,
   dict,
   reactionMenuOpen,
   onToggleReactionMenu,
@@ -35,7 +33,6 @@ export function DirectMessageBubble({
   viewerId: string;
   peerName: string;
   viewerName: string;
-  locale: Locale;
   dict: Dictionary;
   reactionMenuOpen: boolean;
   onToggleReactionMenu: () => void;
@@ -131,13 +128,39 @@ export function DirectMessageBubble({
         {!editing && (
           <p className={`mt-0.5 text-right text-[10px] ${mine ? "text-white/70" : "text-[var(--fg-muted)]"}`}>
             {message.edited_at && `${dict.messages.edited} · `}
-            {formatRelativeTime(message.created_at, locale)}
+            {formatClockTime(message.created_at)}
           </p>
+        )}
+
+        {message.reactions.length > 0 && (
+          <div
+            className={`absolute -bottom-3 flex items-center gap-1 rounded-full border-2 border-[var(--bg)] bg-[var(--bg-elevated)] px-1.5 py-0.5 shadow-sm ${
+              mine ? "right-2" : "left-2"
+            }`}
+          >
+            {message.reactions.map((r) => (
+              <button
+                key={r.emoji}
+                type="button"
+                onClick={() => onReact(r.emoji)}
+                className={`flex items-center gap-0.5 text-xs leading-none ${
+                  r.reacted_by_viewer ? "text-accent-600 dark:text-accent-400" : "text-[var(--fg-muted)]"
+                }`}
+              >
+                <span>{r.emoji}</span>
+                <span>{r.count}</span>
+              </button>
+            ))}
+          </div>
         )}
       </div>
 
       {!editing && (
-        <div className="mt-0.5 flex items-center gap-2.5 px-1 text-[var(--fg-muted)]">
+        <div
+          className={`flex items-center gap-2.5 px-1 text-[var(--fg-muted)] ${
+            message.reactions.length > 0 ? "mt-3.5" : "mt-0.5"
+          }`}
+        >
           <button type="button" onClick={onToggleReactionMenu} title={dict.messages.react} className="hover:text-accent-600">
             <Icon name="smile" size={14} />
           </button>
@@ -173,26 +196,6 @@ export function DirectMessageBubble({
               className="rounded-full px-1 text-base hover:bg-black/5 dark:hover:bg-white/10"
             >
               {emoji}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {message.reactions.length > 0 && (
-        <div className={`mt-1 flex flex-wrap gap-1 ${mine ? "justify-end" : "justify-start"}`}>
-          {message.reactions.map((r) => (
-            <button
-              key={r.emoji}
-              type="button"
-              onClick={() => onReact(r.emoji)}
-              className={`flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-xs ${
-                r.reacted_by_viewer
-                  ? "border-accent-500 bg-accent-500/10 text-accent-600 dark:text-accent-400"
-                  : "border-[var(--border)] bg-[var(--bg-elevated)] text-[var(--fg-muted)]"
-              }`}
-            >
-              <span>{r.emoji}</span>
-              <span>{r.count}</span>
             </button>
           ))}
         </div>

@@ -25,7 +25,7 @@ type AttachmentDraft = {
 };
 
 export default function ConversationPage() {
-  const { dict, locale } = useI18n();
+  const { dict } = useI18n();
   const router = useRouter();
   const params = useParams<{ username: string }>();
   const username = params.username;
@@ -322,7 +322,6 @@ export default function ConversationPage() {
                         viewerId={viewer.id}
                         viewerName={viewer.display_name}
                         peerName={peer.display_name}
-                        locale={locale}
                         dict={dict}
                         reactionMenuOpen={reactionMenuFor === m.id}
                         onToggleReactionMenu={() => setReactionMenuFor((c) => (c === m.id ? null : m.id))}
