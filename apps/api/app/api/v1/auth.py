@@ -52,7 +52,14 @@ def _set_session_cookie(response: Response, request: Request, raw_token: str) ->
     # для показа сайта извне, где фронтенд и API на разных доменах), браузер не
     # пришлёт Lax-cookie в кросс-доменном запросе — переключаемся на None+Secure,
     # что разрешено только вместе с Secure.
-    is_https = request.url.scheme == "https"
+    #
+    # На проде api стоит за Caddy и порт наружу не торчит (см. docker-compose.prod.yml),
+    # так что Caddy — единственный, кто может достучаться до uvicorn напрямую. Caddy
+    # терминирует TLS и проксирует запрос по HTTP внутри docker-сети, поэтому
+    # request.url.scheme здесь всегда "http", даже когда снаружи HTTPS — заголовку
+    # X-Forwarded-Proto от Caddy в этой топологии можно доверять.
+    forwarded_proto = request.headers.get("x-forwarded-proto", "").split(",")[0].strip()
+    is_https = forwarded_proto == "https" or request.url.scheme == "https"
     response.set_cookie(
         key=settings.session_cookie_name,
         value=raw_token,
