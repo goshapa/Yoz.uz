@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 
 import { Icon } from "@/components/icons";
+import { Lightbox } from "@/components/Lightbox";
 import type { DirectMessage } from "@/lib/api";
 import type { Dictionary } from "@/lib/i18n/locales/ru";
 import { formatClockTime } from "@/lib/time";
@@ -52,6 +53,7 @@ export function DirectMessageBubble({
   onCancelEdit: () => void;
 }) {
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   const startRef = useRef({ x: 0, y: 0 });
   const movedRef = useRef(false);
@@ -169,14 +171,16 @@ export function DirectMessageBubble({
           ) : (
             <>
               {message.attachment_type === "image" && message.attachment_url && (
-                <a href={message.attachment_url} target="_blank" rel="noreferrer">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={message.attachment_thumbnail_url ?? message.attachment_url}
-                    alt=""
-                    className="mb-1 max-h-72 w-full rounded-lg object-cover"
-                  />
-                </a>
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={message.attachment_thumbnail_url ?? message.attachment_url}
+                  alt=""
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setLightboxOpen(true);
+                  }}
+                  className="mb-1 max-h-72 w-full cursor-pointer rounded-lg object-cover"
+                />
               )}
               {message.attachment_type === "video" && message.attachment_url && (
                 <video src={message.attachment_url} controls className="mb-1 max-h-72 w-full rounded-lg" />
@@ -276,6 +280,15 @@ export function DirectMessageBubble({
             )}
           </div>
         </div>
+      )}
+
+      {lightboxOpen && message.attachment_url && (
+        <Lightbox
+          items={[{ type: "image", url: message.attachment_url }]}
+          index={0}
+          onClose={() => setLightboxOpen(false)}
+          onIndexChange={() => undefined}
+        />
       )}
     </div>
   );

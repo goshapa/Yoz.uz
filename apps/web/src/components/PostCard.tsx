@@ -7,12 +7,13 @@ import { useState } from "react";
 import { Avatar } from "@/components/Avatar";
 import { FounderBadge } from "@/components/FounderBadge";
 import { Icon } from "@/components/icons";
+import { Lightbox } from "@/components/Lightbox";
 import { ReportModal } from "@/components/ReportModal";
 import { api, type Post } from "@/lib/api";
 import { useI18n } from "@/lib/i18n";
 import { formatRelativeTime } from "@/lib/time";
 
-function ImageGrid({ images, onOpen }: { images: Post["images"]; onOpen: () => void }) {
+function ImageGrid({ images, onOpen }: { images: Post["images"]; onOpen: (index: number) => void }) {
   if (images.length === 0) return null;
 
   const gridClass =
@@ -34,7 +35,7 @@ function ImageGrid({ images, onOpen }: { images: Post["images"]; onOpen: () => v
           alt={image.alt_text ?? ""}
           onClick={(e) => {
             e.stopPropagation();
-            onOpen();
+            onOpen(index);
           }}
           className={`h-48 w-full cursor-pointer object-cover ${
             images.length === 3 && index === 0 ? "col-span-2" : ""
@@ -61,6 +62,7 @@ export function PostCard({
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   const isOwner = currentUsername === state.author.username;
 
@@ -170,14 +172,22 @@ export function PostCard({
 
           <div onClick={goToPost} className="cursor-pointer">
             {state.text && <p className="mt-1 whitespace-pre-wrap break-words text-[15px]">{state.text}</p>}
-            <ImageGrid images={state.images} onOpen={goToPost} />
+            <ImageGrid images={state.images} onOpen={(index) => setLightboxIndex(index)} />
             {state.video_url && (
-              <video
-                src={state.video_url}
-                controls
-                onClick={(e) => e.stopPropagation()}
-                className="mt-2 max-h-96 w-full rounded-xl bg-black"
-              />
+              <div
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightboxIndex(0);
+                }}
+                className="group relative mt-2 cursor-pointer overflow-hidden rounded-xl bg-black"
+              >
+                <video src={state.video_url} preload="metadata" muted className="max-h-96 w-full" />
+                <div className="absolute inset-0 flex items-center justify-center bg-black/10 transition group-hover:bg-black/20">
+                  <span className="flex h-14 w-14 items-center justify-center rounded-full bg-black/50 text-white">
+                    <Icon name="play" size={22} filled />
+                  </span>
+                </div>
+              </div>
             )}
           </div>
 
@@ -262,6 +272,21 @@ export function PostCard({
       </div>
 
       {reportOpen && <ReportModal targetType="post" targetId={state.id} onClose={() => setReportOpen(false)} />}
+
+      {lightboxIndex !== null && (
+        <Lightbox
+          items={
+            state.images.length > 0
+              ? state.images.map((img) => ({ type: "image" as const, url: img.url, alt: img.alt_text ?? undefined }))
+              : state.video_url
+                ? [{ type: "video" as const, url: state.video_url }]
+                : []
+          }
+          index={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+          onIndexChange={setLightboxIndex}
+        />
+      )}
     </article>
   );
 }
