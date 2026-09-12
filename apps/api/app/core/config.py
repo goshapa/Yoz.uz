@@ -45,6 +45,12 @@ class Settings(BaseSettings):
 
     support_contact: str = "support@yoz.local"
 
+    # Web Push (VAPID) — сгенерированы один раз, публичный ключ отдаётся клиенту
+    # как есть, приватный используется только для подписи пушей на бэкенде.
+    vapid_public_key: str = ""
+    vapid_private_key: str = ""
+    vapid_subject: str = "mailto:support@yoz.local"
+
     @property
     def is_production(self) -> bool:
         return self.env == "production"

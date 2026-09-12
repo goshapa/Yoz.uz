@@ -6,6 +6,7 @@ from app.models.moderation_log import ModerationLogEntry
 from app.models.notification import Notification
 from app.models.post import Post
 from app.models.post_image import PostImage
+from app.models.push_subscription import PushSubscription
 from app.models.report import Report
 from app.models.session import Session
 from app.models.tokens import EmailVerificationToken, PasswordResetToken
@@ -21,6 +22,7 @@ __all__ = [
     "TopicMembership",
     "Post",
     "PostImage",
+    "PushSubscription",
     "Hashtag",
     "PostHashtag",
     "PostMention",

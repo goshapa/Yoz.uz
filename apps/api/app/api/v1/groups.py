@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.deps import get_current_user
 from app.db.session import get_db
 from app.models.group import GroupChat, GroupMember, GroupMessage, GroupMessageReaction, GroupRole
+from app.models.message import AttachmentType
 from app.models.user import User
 from app.schemas.auth import MessageResponse
 from app.schemas.message import EditMessageRequest, ReactionRequest, ReactionSummary
@@ -28,6 +29,7 @@ from app.services.images import process_upload
 from app.services.message_attachments import process_message_attachment
 from app.services.pagination import clamp_limit, decode_cursor, encode_cursor
 from app.services.post_serializer import to_author
+from app.services.push import send_push_to_user
 from app.services.rate_limit import user_rate_limiter
 from app.services.storage import upload_object
 
@@ -413,6 +415,20 @@ async def send_group_message(
     db.add(message)
     await db.commit()
     await db.refresh(message)
+
+    if clean_text:
+        push_body = clean_text
+    elif attachment_type == AttachmentType.video:
+        push_body = "🎥 Видео"
+    else:
+        push_body = "🖼 Фото"
+    member_ids = (
+        await db.execute(
+            select(GroupMember.user_id).where(GroupMember.group_id == group_id, GroupMember.user_id != current_user.id)
+        )
+    ).scalars()
+    for member_id in member_ids:
+        await send_push_to_user(db, member_id, f"{group.name} · {current_user.display_name}", push_body, f"/groups/{group_id}")
 
     items = await _serialize_group_messages(db, [message], current_user.id)
     return items[0]

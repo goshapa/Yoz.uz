@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
 import { Avatar } from "@/components/Avatar";
+import { PushNotificationSettings } from "@/components/PushNotificationSettings";
 import { LoadingState } from "@/components/Spinner";
 import { TwoFactorSettings } from "@/components/TwoFactorSettings";
 import { api, ApiError, type UserMe } from "@/lib/api";
@@ -231,6 +232,8 @@ export default function SettingsPage() {
             </button>
           </form>
         )}
+
+        <PushNotificationSettings />
 
         <div className="space-y-3 border-t border-[var(--border)] pt-6">
           <h2 className="text-sm font-semibold text-[var(--fg-muted)]">{dict.settings.account}</h2>
