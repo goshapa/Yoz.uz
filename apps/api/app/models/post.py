@@ -23,6 +23,9 @@ class Post(Base):
     topic_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("topics.id", ondelete="RESTRICT"), nullable=False, index=True
     )
+    # Пост виден в ленте своего сообщества (?topic=...), но скрыт из общей
+    # ленты "Все темы"/рекомендаций — для объявлений конкретного сообщества.
+    community_only: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     city: Mapped[str | None] = mapped_column(String(100), nullable=True)
 
     # Ответ — это Post с parent_post_id; reply_to_user_id — «адресат» конкретного
