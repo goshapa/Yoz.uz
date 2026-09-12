@@ -283,8 +283,8 @@ export function PostComposer({
         </div>
       )}
 
-      <div className="flex items-center justify-between">
-        <div className="relative flex items-center gap-1.5">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="relative flex flex-wrap items-center gap-1.5">
           <input
             ref={fileInputRef}
             type="file"
