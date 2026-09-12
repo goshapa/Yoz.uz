@@ -130,8 +130,16 @@ export default function ProfilePage() {
           </div>
           <div className="px-4 pb-4">
             <div className="-mt-10 flex items-end justify-between">
-              <div className="rounded-full ring-4 ring-[var(--bg)] shadow-lg">
-                <Avatar src={profile.avatar_url} name={profile.display_name} size={80} />
+              <div
+                className={
+                  profile.is_founder
+                    ? "rounded-full bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-500 p-[3px] shadow-lg shadow-amber-500/40"
+                    : "rounded-full ring-4 ring-[var(--bg)] shadow-lg"
+                }
+              >
+                <div className={profile.is_founder ? "rounded-full ring-4 ring-[var(--bg)]" : ""}>
+                  <Avatar src={profile.avatar_url} name={profile.display_name} size={80} />
+                </div>
               </div>
               {profile.is_self ? (
                 <Link href="/settings" className="btn-secondary mt-10">
@@ -174,11 +182,13 @@ export default function ProfilePage() {
               ) : null}
             </div>
 
-            <h1 className="mt-2 flex items-center gap-1.5 text-lg font-semibold">
-              {profile.display_name}
-              {profile.is_founder && <FounderBadge size={12} />}
-            </h1>
+            <h1 className="mt-2 text-lg font-semibold">{profile.display_name}</h1>
             <p className="text-sm text-[var(--fg-muted)]">@{profile.username}</p>
+            {profile.is_founder && (
+              <div className="mt-2">
+                <FounderBadge variant="full" label={dict.profile.founderBadge} />
+              </div>
+            )}
             {profile.bio && <p className="mt-2 whitespace-pre-wrap text-sm">{profile.bio}</p>}
 
             <div className="mt-2 flex flex-wrap gap-3 text-xs text-[var(--fg-muted)]">

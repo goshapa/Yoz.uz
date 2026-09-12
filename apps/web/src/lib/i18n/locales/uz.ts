@@ -114,6 +114,7 @@ const uz: Dictionary = {
     back: "Orqaga",
   },
   profile: {
+    founderBadge: "Yoz asoschisi",
     editProfile: "Profilni tahrirlash",
     follow: "Obuna bo‘lish",
     unfollow: "Obunani bekor qilish",

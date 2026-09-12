@@ -112,6 +112,7 @@ const ru = {
     back: "Назад",
   },
   profile: {
+    founderBadge: "Основатель Yoz",
     editProfile: "Редактировать профиль",
     follow: "Подписаться",
     unfollow: "Отписаться",

@@ -114,6 +114,7 @@ const en: Dictionary = {
     back: "Back",
   },
   profile: {
+    founderBadge: "Founder of Yoz",
     editProfile: "Edit profile",
     follow: "Follow",
     unfollow: "Unfollow",
