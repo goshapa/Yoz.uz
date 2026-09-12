@@ -121,7 +121,7 @@ export default function HomePage() {
         <>
           <div className="mx-3 mt-3 flex items-center gap-2">
             <select
-              className="input w-auto text-base sm:text-xs"
+              className="input min-w-0 flex-1 text-base sm:text-xs"
               value={topicFilter}
               onChange={(e) => setTopicFilter(e.target.value)}
             >
@@ -132,7 +132,10 @@ export default function HomePage() {
                 </option>
               ))}
             </select>
-            <Link href="/communities" className="text-xs font-medium text-accent-600 dark:text-accent-400">
+            <Link
+              href="/communities"
+              className="shrink-0 text-xs font-medium text-accent-600 dark:text-accent-400"
+            >
               {dict.feed.browseCommunities}
             </Link>
           </div>
