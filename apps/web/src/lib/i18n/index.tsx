@@ -50,6 +50,23 @@ export function topicName(topic: { name_ru: string; name_uz: string; name_en: st
   return topic.name_ru;
 }
 
+// Русское склонение: 1 участник, 2-4 участника, 0/5-20 участников (11-14 —
+// всегда "участников", несмотря на последнюю цифру).
+function ruPluralForm(n: number): "one" | "few" | "many" {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return "one";
+  if (mod10 >= 2 && mod10 <= 4 && !(mod100 >= 12 && mod100 <= 14)) return "few";
+  return "many";
+}
+
+export function formatMembersCount(count: number, locale: Locale): string {
+  if (locale === "uz") return `${count} a'zo`;
+  if (locale === "en") return `${count} ${count === 1 ? "member" : "members"}`;
+  const forms = { one: "участник", few: "участника", many: "участников" } as const;
+  return `${count} ${forms[ruPluralForm(count)]}`;
+}
+
 export function useI18n(): I18nContextValue {
   const ctx = useContext(I18nContext);
   if (!ctx) {

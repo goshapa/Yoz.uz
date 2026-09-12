@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { LoadingState } from "@/components/Spinner";
 import { api, type Topic, type TopicMembership, type UserMe } from "@/lib/api";
-import { topicName, useI18n } from "@/lib/i18n";
+import { formatMembersCount, topicName, useI18n } from "@/lib/i18n";
 
 export default function CommunitiesPage() {
   const { dict, locale } = useI18n();
@@ -65,7 +65,7 @@ export default function CommunitiesPage() {
           <Link href={`/communities/${topic.id}`} className="min-w-0 flex-1">
             <p className="truncate font-semibold hover:underline">{topicName(topic, locale)}</p>
             <p className="text-xs text-[var(--fg-muted)]">
-              {topic.members_count} {dict.communities.membersCount}
+              {formatMembersCount(topic.members_count, locale)}
             </p>
           </Link>
           <button

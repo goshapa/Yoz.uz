@@ -7,7 +7,7 @@ import { AppShell } from "@/components/AppShell";
 import { FeedList } from "@/components/FeedList";
 import { LoadingState } from "@/components/Spinner";
 import { api, type Topic, type TopicMembership, type UserMe } from "@/lib/api";
-import { topicName, useI18n } from "@/lib/i18n";
+import { formatMembersCount, topicName, useI18n } from "@/lib/i18n";
 
 export default function CommunityPage() {
   const { dict, locale } = useI18n();
@@ -66,7 +66,7 @@ export default function CommunityPage() {
             <div className="min-w-0">
               <h1 className="truncate font-semibold">{topicName(topic, locale)}</h1>
               <p className="text-xs text-[var(--fg-muted)]">
-                {topic.members_count} {dict.communities.membersCount}
+                {formatMembersCount(topic.members_count, locale)}
               </p>
             </div>
             <button

@@ -59,10 +59,7 @@ export function PostComposer({
     if (isReply) return;
     api
       .get<Topic[]>("/topics")
-      .then((list) => {
-        setTopics(list);
-        setTopicId((current) => current || list[0]?.id || "");
-      })
+      .then(setTopics)
       .catch(() => setTopics([]));
   }, [isReply]);
 
