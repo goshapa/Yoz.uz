@@ -7,18 +7,16 @@ import { AppShell } from "@/components/AppShell";
 import { FeedList } from "@/components/FeedList";
 import { SettingsMenu } from "@/components/SettingsMenu";
 import { SuggestedUsers } from "@/components/SuggestedUsers";
-import { api, type Post, type Topic, type UserMe } from "@/lib/api";
-import { topicName, useI18n } from "@/lib/i18n";
+import { api, type Post, type UserMe } from "@/lib/api";
+import { useI18n } from "@/lib/i18n";
 
 type Tab = "following" | "overview";
 
 export default function HomePage() {
-  const { dict, locale } = useI18n();
+  const { dict } = useI18n();
   const [tab, setTab] = useState<Tab>("overview");
   const [user, setUser] = useState<UserMe | null>(null);
   const [checkedAuth, setCheckedAuth] = useState(false);
-  const [topics, setTopics] = useState<Topic[]>([]);
-  const [topicFilter, setTopicFilter] = useState("");
   const [injectedPost, setInjectedPost] = useState<Post | null>(null);
 
   useEffect(() => {
@@ -30,19 +28,7 @@ export default function HomePage() {
       })
       .catch(() => setUser(null))
       .finally(() => setCheckedAuth(true));
-
-    api
-      .get<Topic[]>("/topics")
-      .then(setTopics)
-      .catch(() => setTopics([]));
   }, []);
-
-  const overviewEndpoint = (() => {
-    const params = new URLSearchParams();
-    if (topicFilter) params.set("topic", topicFilter);
-    const qs = params.toString();
-    return `/feed/overview${qs ? `?${qs}` : ""}`;
-  })();
 
   return (
     <AppShell user={user} onPostCreated={setInjectedPost}>
@@ -92,6 +78,12 @@ export default function HomePage() {
         >
           {dict.feed.tabOverview}
         </button>
+        <Link
+          href="/communities"
+          className="flex-1 rounded-lg py-2 text-center text-sm font-bold text-[var(--fg-muted)] transition hover:bg-black/5 dark:hover:bg-white/5"
+        >
+          {dict.communities.title}
+        </Link>
       </nav>
 
       {tab === "following" && (
@@ -118,35 +110,12 @@ export default function HomePage() {
       )}
 
       {tab === "overview" && (
-        <>
-          <div className="mx-3 mt-3 flex items-center gap-2">
-            <select
-              className="input min-w-0 flex-1 text-base sm:text-xs"
-              value={topicFilter}
-              onChange={(e) => setTopicFilter(e.target.value)}
-            >
-              <option value="">{dict.feed.allTopics}</option>
-              {topics.map((topic) => (
-                <option key={topic.id} value={topic.id}>
-                  {topicName(topic, locale)}
-                </option>
-              ))}
-            </select>
-            <Link
-              href="/communities"
-              className="shrink-0 text-xs font-medium text-accent-600 dark:text-accent-400"
-            >
-              {dict.feed.browseCommunities}
-            </Link>
-          </div>
-          <FeedList
-            key={overviewEndpoint}
-            endpoint={overviewEndpoint}
-            emptyMessage={dict.feed.emptyOverview}
-            currentUsername={user?.username}
-            storageKey="overview"
-          />
-        </>
+        <FeedList
+          endpoint="/feed/overview"
+          emptyMessage={dict.feed.emptyOverview}
+          currentUsername={user?.username}
+          storageKey="overview"
+        />
       )}
     </AppShell>
   );
