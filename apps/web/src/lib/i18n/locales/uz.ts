@@ -76,7 +76,7 @@ const uz: Dictionary = {
     replyPlaceholder: "Javob yozing…",
     replyingTo: "Javob",
     topicLabel: "Mavzu",
-    topicPlaceholder: "Mavzuni tanlang",
+    topicPlaceholder: "Tavsiyalar",
     cityLabel: "Shahar (ixtiyoriy)",
     addImage: "Rasm qo‘shish",
     addVideo: "Video qo‘shish",

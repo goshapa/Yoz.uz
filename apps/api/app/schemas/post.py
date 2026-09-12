@@ -25,7 +25,7 @@ class PostOut(BaseModel):
     id: uuid.UUID
     author: PostAuthor
     text: str | None
-    topic_id: uuid.UUID
+    topic_id: uuid.UUID | None
     city: str | None
     images: list[PostImageOut]
     video_url: str | None

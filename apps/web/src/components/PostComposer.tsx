@@ -153,18 +153,13 @@ export function PostComposer({
       setError(dict.composer.emptyError);
       return;
     }
-    if (!isReply && !topicId) {
-      setError(dict.errors.generic);
-      return;
-    }
-
     const formData = new FormData();
     if (trimmed) formData.append("text", trimmed);
     if (isReply && parentPostId) {
       formData.append("parent_post_id", parentPostId);
       if (replyTo) formData.append("reply_to_user_id", replyTo.id);
     } else {
-      formData.append("topic_id", topicId);
+      if (topicId) formData.append("topic_id", topicId);
       if (city.trim()) formData.append("city", city.trim());
     }
     for (const img of images) {
@@ -225,11 +220,8 @@ export function PostComposer({
               className="input"
               value={topicId}
               onChange={(e) => setTopicId(e.target.value)}
-              required
             >
-              <option value="" disabled>
-                {dict.composer.topicPlaceholder}
-              </option>
+              <option value="">{dict.composer.topicPlaceholder}</option>
               {topics.map((topic) => (
                 <option key={topic.id} value={topic.id}>
                   {topicName(topic, locale)}

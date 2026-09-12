@@ -100,9 +100,7 @@ async def create_post(
             addressee = await db.get(User, resolved_reply_to)
             if addressee is None:
                 raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Адресат ответа не найден")
-    else:
-        if resolved_topic_id is None:
-            raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Выберите тему публикации")
+    elif resolved_topic_id is not None:
         topic = await db.get(Topic, resolved_topic_id)
         if topic is None or not topic.is_active:
             raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Недопустимая тема")

@@ -74,7 +74,7 @@ const ru = {
     replyPlaceholder: "Написать ответ…",
     replyingTo: "Ответ",
     topicLabel: "Тема",
-    topicPlaceholder: "Выберите тему",
+    topicPlaceholder: "Рекомендации",
     cityLabel: "Город (необязательно)",
     addImage: "Добавить фото",
     addVideo: "Добавить видео",

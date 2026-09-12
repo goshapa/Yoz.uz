@@ -112,7 +112,7 @@ export type Post = {
   id: string;
   author: PostAuthor;
   text: string | null;
-  topic_id: string;
+  topic_id: string | null;
   city: string | null;
   images: PostImage[];
   video_url: string | null;

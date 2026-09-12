@@ -20,8 +20,10 @@ class Post(Base):
     # Видео — альтернатива изображениям (PostImage), не вместе: пост либо с
     # картинками (до 4), либо с одним видео.
     video_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
-    topic_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("topics.id", ondelete="RESTRICT"), nullable=False, index=True
+    # NULL = обычный пост без привязки к сообществу — виден только в общей
+    # ленте "Рекомендации", ни в одной ленте сообщества не показывается.
+    topic_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("topics.id", ondelete="RESTRICT"), nullable=True, index=True
     )
     # Пост виден в ленте своего сообщества (?topic=...), но скрыт из общей
     # ленты "Все темы"/рекомендаций — для объявлений конкретного сообщества.

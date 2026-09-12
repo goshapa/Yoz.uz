@@ -76,7 +76,7 @@ const en: Dictionary = {
     replyPlaceholder: "Write a reply…",
     replyingTo: "Reply",
     topicLabel: "Topic",
-    topicPlaceholder: "Choose a topic",
+    topicPlaceholder: "Recommendations",
     cityLabel: "City (optional)",
     addImage: "Add photo",
     addVideo: "Add video",
