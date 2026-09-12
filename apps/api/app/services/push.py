@@ -1,5 +1,6 @@
 import asyncio
 import json
+import logging
 import uuid
 
 from pywebpush import WebPushException, webpush
@@ -10,6 +11,7 @@ from app.core.config import get_settings
 from app.models.push_subscription import PushSubscription
 
 settings = get_settings()
+logger = logging.getLogger("yoz.push")
 
 
 def _send_one(sub: PushSubscription, payload: str) -> int | None:
@@ -30,6 +32,11 @@ def _send_one(sub: PushSubscription, payload: str) -> int | None:
         status_code = exc.response.status_code if exc.response is not None else None
         if status_code in (404, 410):
             return status_code
+    except Exception:
+        # Одна битая/повреждённая подписка (например, обрезанные ключи) не должна
+        # ронять всю отправку уведомления — pywebpush может кинуть не только
+        # WebPushException (например, при разборе некорректных base64-ключей).
+        logger.warning("push send failed for subscription %s", sub.id, exc_info=True)
     return None
 
 
