@@ -29,7 +29,7 @@ from app.services.videos import process_video_upload
 
 router = APIRouter(prefix="/posts", tags=["posts"])
 
-MAX_TEXT_LENGTH = 500
+MAX_TEXT_LENGTH = 5000
 
 
 async def _get_visible_post(db: AsyncSession, post_id: uuid.UUID, viewer: User | None) -> Post:

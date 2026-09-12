@@ -16,7 +16,7 @@ class Post(Base):
     author_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    text: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    text: Mapped[str | None] = mapped_column(String(5000), nullable=True)
     # Видео — альтернатива изображениям (PostImage), не вместе: пост либо с
     # картинками (до 4), либо с одним видео.
     video_url: Mapped[str | None] = mapped_column(String(500), nullable=True)

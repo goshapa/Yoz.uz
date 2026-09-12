@@ -6,7 +6,7 @@ import { Icon } from "@/components/icons";
 import { api, ApiError, type Post, type PostAuthor, type Topic } from "@/lib/api";
 import { topicName, useI18n } from "@/lib/i18n";
 
-const MAX_TEXT_LENGTH = 500;
+const MAX_TEXT_LENGTH = 5000;
 const MAX_IMAGES = 4;
 const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
 
