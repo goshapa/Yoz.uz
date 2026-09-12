@@ -133,11 +133,11 @@ export default function ProfilePage() {
               <div
                 className={
                   profile.is_founder
-                    ? "rounded-full bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-500 p-[3px] shadow-lg shadow-amber-500/40"
+                    ? "rounded-full bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-500 p-[3px] shadow-md shadow-amber-500/30"
                     : "rounded-full ring-4 ring-[var(--bg)] shadow-lg"
                 }
               >
-                <div className={profile.is_founder ? "rounded-full ring-4 ring-[var(--bg)]" : ""}>
+                <div className={profile.is_founder ? "rounded-full bg-[var(--bg)] p-1" : ""}>
                   <Avatar src={profile.avatar_url} name={profile.display_name} size={80} />
                 </div>
               </div>
@@ -182,7 +182,10 @@ export default function ProfilePage() {
               ) : null}
             </div>
 
-            <h1 className="mt-2 text-lg font-semibold">{profile.display_name}</h1>
+            <h1 className="mt-2 flex items-center gap-1.5 text-lg font-semibold">
+              {profile.display_name}
+              {profile.is_founder && <FounderBadge size={12} />}
+            </h1>
             <p className="text-sm text-[var(--fg-muted)]">@{profile.username}</p>
             {profile.is_founder && (
               <div className="mt-2">
