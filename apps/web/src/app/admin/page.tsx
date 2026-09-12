@@ -375,6 +375,12 @@ function TopicsTab() {
   const [newNameUz, setNewNameUz] = useState("");
   const [newNameEn, setNewNameEn] = useState("");
 
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editNameRu, setEditNameRu] = useState("");
+  const [editNameUz, setEditNameUz] = useState("");
+  const [editNameEn, setEditNameEn] = useState("");
+  const [saving, setSaving] = useState(false);
+
   useEffect(() => {
     api
       .get<AdminTopic[]>("/admin/topics")
@@ -385,6 +391,28 @@ function TopicsTab() {
   async function toggleActive(topic: AdminTopic) {
     const updated = await api.patch<AdminTopic>(`/admin/topics/${topic.id}`, { is_active: !topic.is_active });
     setTopics((current) => current?.map((t) => (t.id === topic.id ? updated : t)) ?? null);
+  }
+
+  function startEditing(topic: AdminTopic) {
+    setEditingId(topic.id);
+    setEditNameRu(topic.name_ru);
+    setEditNameUz(topic.name_uz);
+    setEditNameEn(topic.name_en);
+  }
+
+  async function saveEditing(topicId: string) {
+    setSaving(true);
+    try {
+      const updated = await api.patch<AdminTopic>(`/admin/topics/${topicId}`, {
+        name_ru: editNameRu,
+        name_uz: editNameUz,
+        name_en: editNameEn,
+      });
+      setTopics((current) => current?.map((t) => (t.id === topicId ? updated : t)) ?? null);
+      setEditingId(null);
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function createTopic(e: React.FormEvent) {
@@ -404,17 +432,45 @@ function TopicsTab() {
 
   return (
     <div className="space-y-2 p-3">
-      {topics?.map((t) => (
-        <div key={t.id} className="card flex items-center justify-between px-4 py-2.5 text-sm">
-          <span className="flex items-center gap-2">
-            <span className={`h-2 w-2 shrink-0 rounded-full ${t.is_active ? "bg-emerald-500" : "bg-[var(--fg-muted)]"}`} />
-            {t.name_ru} / {t.name_uz} / {t.name_en} <span className="text-xs text-[var(--fg-muted)]">({t.slug})</span>
-          </span>
-          <button type="button" onClick={() => toggleActive(t)} className="btn-secondary-sm">
-            {t.is_active ? dict.admin.deactivate : dict.admin.activate}
-          </button>
-        </div>
-      ))}
+      {topics?.map((t) =>
+        editingId === t.id ? (
+          <div key={t.id} className="card space-y-2 p-4 text-sm">
+            <input className="input" placeholder="Название (ru)" value={editNameRu} onChange={(e) => setEditNameRu(e.target.value)} />
+            <input className="input" placeholder="Nomi (uz)" value={editNameUz} onChange={(e) => setEditNameUz(e.target.value)} />
+            <input className="input" placeholder="Name (en)" value={editNameEn} onChange={(e) => setEditNameEn(e.target.value)} />
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => saveEditing(t.id)}
+                disabled={saving}
+                className="btn-primary-sm flex-1"
+              >
+                {dict.admin.save}
+              </button>
+              <button type="button" onClick={() => setEditingId(null)} className="btn-secondary-sm flex-1">
+                {dict.admin.cancel}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div key={t.id} className="card flex items-center justify-between gap-2 px-4 py-2.5 text-sm">
+            <span className="flex min-w-0 items-center gap-2">
+              <span className={`h-2 w-2 shrink-0 rounded-full ${t.is_active ? "bg-emerald-500" : "bg-[var(--fg-muted)]"}`} />
+              <span className="truncate">
+                {t.name_ru} / {t.name_uz} / {t.name_en} <span className="text-xs text-[var(--fg-muted)]">({t.slug})</span>
+              </span>
+            </span>
+            <span className="flex shrink-0 gap-2">
+              <button type="button" onClick={() => startEditing(t)} className="btn-secondary-sm">
+                {dict.admin.edit}
+              </button>
+              <button type="button" onClick={() => toggleActive(t)} className="btn-secondary-sm">
+                {t.is_active ? dict.admin.deactivate : dict.admin.activate}
+              </button>
+            </span>
+          </div>
+        )
+      )}
 
       <form onSubmit={createTopic} className="card space-y-2 p-4">
         <h3 className="text-sm font-semibold">{dict.admin.newTopic}</h3>
