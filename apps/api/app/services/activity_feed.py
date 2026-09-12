@@ -29,6 +29,7 @@ async def paginate_activity(
         Post.parent_post_id.is_(None),
         Post.deleted_at.is_(None),
         Post.is_hidden.is_(False),
+        Post.community_only.is_(False),
     )
 
     reposts_activity = (
