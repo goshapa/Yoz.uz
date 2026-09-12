@@ -67,6 +67,7 @@ const ru = {
     filterCity: "Город",
     allTopics: "Все темы",
     cityPlaceholder: "Любой город",
+    browseCommunities: "Все сообщества",
   },
   composer: {
     placeholder: "Что нового?",
@@ -183,6 +184,16 @@ const ru = {
     notFound: "Группа не найдена",
     saved: "Изменения сохранены",
     membersCount: "участников",
+  },
+  communities: {
+    title: "Сообщества",
+    subtitle: "Вступайте в сообщества и следите за их лентой",
+    empty: "Сообщества пока не созданы",
+    membersCount: "участников",
+    join: "Вступить",
+    leave: "Покинуть",
+    notFound: "Сообщество не найдено",
+    emptyFeed: "В этом сообществе пока нет публикаций",
   },
   settings: {
     title: "Настройки профиля",

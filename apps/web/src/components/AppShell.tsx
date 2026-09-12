@@ -114,6 +114,19 @@ export function AppShell({
                 )}
               </Link>
             ))}
+            <Link
+              href="/communities"
+              className={`rounded-lg px-3 py-2 text-sm font-bold transition ${
+                pathname.startsWith("/communities")
+                  ? "bg-accent-500/10 text-accent-600 shadow-sm border border-accent-500/20 dark:text-accent-400"
+                  : "text-[var(--fg-muted)] hover:bg-black/5 dark:hover:bg-white/5"
+              }`}
+            >
+              <span className="mr-2 inline-flex align-middle" aria-hidden>
+                <Icon name="users" size={18} />
+              </span>
+              {dict.communities.title}
+            </Link>
             {user && user.role !== "user" && (
               <Link
                 href="/admin"

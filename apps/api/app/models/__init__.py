@@ -9,7 +9,7 @@ from app.models.post_image import PostImage
 from app.models.report import Report
 from app.models.session import Session
 from app.models.tokens import EmailVerificationToken, PasswordResetToken
-from app.models.topic import Topic
+from app.models.topic import Topic, TopicMembership
 from app.models.user import User
 
 __all__ = [
@@ -18,6 +18,7 @@ __all__ = [
     "EmailVerificationToken",
     "PasswordResetToken",
     "Topic",
+    "TopicMembership",
     "Post",
     "PostImage",
     "Hashtag",

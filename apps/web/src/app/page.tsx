@@ -119,7 +119,7 @@ export default function HomePage() {
 
       {tab === "overview" && (
         <>
-          <div className="mx-3 mt-3 flex gap-2">
+          <div className="mx-3 mt-3 flex items-center gap-2">
             <select
               className="input w-auto text-base sm:text-xs"
               value={topicFilter}
@@ -132,6 +132,9 @@ export default function HomePage() {
                 </option>
               ))}
             </select>
+            <Link href="/communities" className="text-xs font-medium text-accent-600 dark:text-accent-400">
+              {dict.feed.browseCommunities}
+            </Link>
           </div>
           <FeedList
             key={overviewEndpoint}

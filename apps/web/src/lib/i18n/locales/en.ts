@@ -69,6 +69,7 @@ const en: Dictionary = {
     filterCity: "City",
     allTopics: "All topics",
     cityPlaceholder: "Any city",
+    browseCommunities: "All communities",
   },
   composer: {
     placeholder: "What's new?",
@@ -185,6 +186,16 @@ const en: Dictionary = {
     notFound: "Group not found",
     saved: "Changes saved",
     membersCount: "members",
+  },
+  communities: {
+    title: "Communities",
+    subtitle: "Join communities and follow their feed",
+    empty: "No communities yet",
+    membersCount: "members",
+    join: "Join",
+    leave: "Leave",
+    notFound: "Community not found",
+    emptyFeed: "No posts in this community yet",
   },
   settings: {
     title: "Profile settings",

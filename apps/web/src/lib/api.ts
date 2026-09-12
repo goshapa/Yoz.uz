@@ -145,6 +145,13 @@ export type Topic = {
   name_ru: string;
   name_uz: string;
   name_en: string;
+  members_count: number;
+  is_member: boolean;
+};
+
+export type TopicMembership = {
+  members_count: number;
+  is_member: boolean;
 };
 
 export type SearchUser = {

@@ -69,6 +69,7 @@ const uz: Dictionary = {
     filterCity: "Shahar",
     allTopics: "Barcha mavzular",
     cityPlaceholder: "Istalgan shahar",
+    browseCommunities: "Barcha jamoalar",
   },
   composer: {
     placeholder: "Yangiliklar bormi?",
@@ -185,6 +186,16 @@ const uz: Dictionary = {
     notFound: "Guruh topilmadi",
     saved: "O‘zgarishlar saqlandi",
     membersCount: "a'zo",
+  },
+  communities: {
+    title: "Jamoalar",
+    subtitle: "Jamoalarga qo‘shiling va ularning lentasini kuzating",
+    empty: "Hozircha jamoalar yo‘q",
+    membersCount: "a'zo",
+    join: "Qo‘shilish",
+    leave: "Tark etish",
+    notFound: "Jamoa topilmadi",
+    emptyFeed: "Bu jamoada hali postlar yo‘q",
   },
   settings: {
     title: "Profil sozlamalari",
