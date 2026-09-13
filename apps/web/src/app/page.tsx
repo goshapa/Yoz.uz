@@ -84,6 +84,12 @@ export default function HomePage() {
         >
           {dict.communities.title}
         </Link>
+        <Link
+          href="/games"
+          className="flex-1 rounded-lg py-2 text-center text-sm font-bold text-[var(--fg-muted)] transition hover:bg-black/5 dark:hover:bg-white/5"
+        >
+          {dict.games.title}
+        </Link>
       </nav>
 
       {tab === "following" && (
