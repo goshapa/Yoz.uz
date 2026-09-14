@@ -57,7 +57,11 @@ export default function CommunitiesPage() {
 
       {topics === null && <LoadingState label={dict.common.loading} />}
       {topics && topics.length === 0 && (
-        <div className="px-6 py-16 text-center text-sm text-[var(--fg-muted)]">{dict.communities.empty}</div>
+        <div className="px-6 py-16 text-center text-sm text-[var(--fg-muted)]">
+          {!user || (user.role === "user" && user.university_topic_id === null)
+            ? dict.communities.studentsOnly
+            : dict.communities.empty}
+        </div>
       )}
 
       {topics?.map((topic) => (

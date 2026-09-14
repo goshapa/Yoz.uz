@@ -104,6 +104,11 @@ async def create_post(
         topic = await db.get(Topic, resolved_topic_id)
         if topic is None or not topic.is_active:
             raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Недопустимая тема")
+        is_staff = current_user.role != UserRole.user
+        if not is_staff and current_user.university_topic_id != resolved_topic_id:
+            raise HTTPException(
+                status.HTTP_403_FORBIDDEN, detail="Публиковать можно только в сообщество своего университета"
+            )
 
     video_url = await process_video_upload(video) if has_video else None
 

@@ -11,6 +11,7 @@ from app.core.security import generate_otp_code, generate_token, hash_password, 
 from app.db.session import get_db
 from app.models.session import Session
 from app.models.tokens import EmailVerificationToken, PasswordResetToken
+from app.models.topic import Topic
 from app.models.user import User, UserRole
 from app.schemas.auth import (
     ForgotPasswordRequest,
@@ -106,11 +107,17 @@ async def signup(payload: SignupRequest, db: AsyncSession = Depends(get_db)):
             detail="Пользователь с таким username или email уже существует",
         )
 
+    if payload.university_topic_id is not None:
+        topic = await db.get(Topic, payload.university_topic_id)
+        if topic is None or not topic.is_active:
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Недопустимый университет")
+
     user = User(
         display_name=payload.display_name,
         username=payload.username,
         email=payload.email.lower(),
         password_hash=hash_password(payload.password),
+        university_topic_id=payload.university_topic_id,
     )
     db.add(user)
     await db.flush()

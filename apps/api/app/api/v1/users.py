@@ -1,4 +1,5 @@
 import asyncio
+import uuid
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from sqlalchemy import delete, exists, func, or_, select, tuple_
@@ -12,6 +13,7 @@ from app.models.interactions import Block, Follow
 from app.models.notification import NotificationType
 from app.models.post import Post
 from app.models.post_image import PostImage
+from app.models.topic import Topic
 from app.models.user import User
 from app.schemas.auth import MessageResponse
 from app.schemas.post import FeedPage, PostAuthor
@@ -44,6 +46,7 @@ async def update_current_user(
     bio: str | None = Form(default=None),
     city: str | None = Form(default=None),
     website: str | None = Form(default=None),
+    university_topic_id: str | None = Form(default=None),
     avatar: UploadFile | None = File(default=None),
     cover: UploadFile | None = File(default=None),
 ):
@@ -84,6 +87,20 @@ async def update_current_user(
 
     if website is not None:
         current_user.website = website.strip() or None
+
+    if university_topic_id is not None:
+        cleaned = university_topic_id.strip()
+        if not cleaned:
+            current_user.university_topic_id = None
+        else:
+            try:
+                topic_uuid = uuid.UUID(cleaned)
+            except ValueError:
+                raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Недопустимый университет")
+            topic = await db.get(Topic, topic_uuid)
+            if topic is None or not topic.is_active:
+                raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Недопустимый университет")
+            current_user.university_topic_id = topic_uuid
 
     if avatar is not None and avatar.filename:
         processed = await process_upload(avatar)

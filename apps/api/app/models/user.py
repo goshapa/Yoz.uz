@@ -2,7 +2,7 @@ import enum
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Enum, String, func
+from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, String, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -38,6 +38,14 @@ class User(Base):
     bio: Mapped[str | None] = mapped_column(String(160), nullable=True)
     city: Mapped[str | None] = mapped_column(String(100), nullable=True)
     website: Mapped[str | None] = mapped_column(String(255), nullable=True)
+
+    # Университет, указанный при регистрации (или позже в настройках) — определяет
+    # единственное университетское сообщество, которое пользователь видит и может
+    # вступить в него (см. app/api/v1/topics.py). NULL — сообщества не показываются вовсе:
+    # ни школьникам, ни тем, кто не отметил «Я студент(ка)».
+    university_topic_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("topics.id", ondelete="SET NULL"), nullable=True, index=True
+    )
 
     role: Mapped[UserRole] = mapped_column(
         Enum(UserRole, name="user_role"), default=UserRole.user, nullable=False

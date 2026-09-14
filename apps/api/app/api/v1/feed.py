@@ -1,6 +1,6 @@
 import uuid
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select, tuple_
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -8,7 +8,7 @@ from app.api.deps import get_current_user, get_current_user_optional
 from app.db.session import get_db
 from app.models.interactions import Follow
 from app.models.post import Post
-from app.models.user import User
+from app.models.user import User, UserRole
 from app.schemas.post import FeedPage
 from app.services.activity_feed import paginate_activity
 from app.services.blocks import get_related_block_ids
@@ -51,6 +51,11 @@ async def overview_feed(
     с необязательными фильтрами по теме и городу. Публикации заблокированных
     друг другом аккаунтов скрываются из персональной ленты авторизованного пользователя."""
     limit = clamp_limit(limit)
+
+    if topic is not None:
+        is_staff = current_user is not None and current_user.role != UserRole.user
+        if not is_staff and (current_user is None or current_user.university_topic_id != topic):
+            raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Сообщество недоступно")
 
     query = select(Post).where(
         Post.parent_post_id.is_(None), Post.deleted_at.is_(None), Post.is_hidden.is_(False)

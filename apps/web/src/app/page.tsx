@@ -80,12 +80,14 @@ export default function HomePage() {
         >
           {dict.feed.tabOverview}
         </button>
-        <Link
-          href="/communities"
-          className="flex-1 rounded-lg py-2 text-center text-sm font-bold text-[var(--fg-muted)] transition hover:bg-black/5 dark:hover:bg-white/5"
-        >
-          {dict.communities.title}
-        </Link>
+        {user && (user.role !== "user" || user.university_topic_id !== null) && (
+          <Link
+            href="/communities"
+            className="flex-1 rounded-lg py-2 text-center text-sm font-bold text-[var(--fg-muted)] transition hover:bg-black/5 dark:hover:bg-white/5"
+          >
+            {dict.communities.title}
+          </Link>
+        )}
       </nav>
 
       {tab === "following" && (

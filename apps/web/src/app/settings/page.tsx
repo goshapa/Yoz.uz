@@ -8,6 +8,7 @@ import { Avatar } from "@/components/Avatar";
 import { PushNotificationSettings } from "@/components/PushNotificationSettings";
 import { LoadingState } from "@/components/Spinner";
 import { TwoFactorSettings } from "@/components/TwoFactorSettings";
+import { resolveUniversityTopicId, UniversityPicker } from "@/components/UniversityPicker";
 import { api, ApiError, type UserMe } from "@/lib/api";
 import { useI18n } from "@/lib/i18n";
 
@@ -23,6 +24,8 @@ export default function SettingsPage() {
   const [bio, setBio] = useState("");
   const [city, setCity] = useState("");
   const [website, setWebsite] = useState("");
+  const [isStudent, setIsStudent] = useState(false);
+  const [universityId, setUniversityId] = useState("");
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [coverFile, setCoverFile] = useState<File | null>(null);
 
@@ -52,6 +55,8 @@ export default function SettingsPage() {
         setBio(u.bio ?? "");
         setCity(u.city ?? "");
         setWebsite(u.website ?? "");
+        setIsStudent(u.university_topic_id !== null);
+        setUniversityId(u.university_topic_id ?? "");
       })
       .catch(() => setUser(null))
       .finally(() => setCheckedAuth(true));
@@ -68,6 +73,7 @@ export default function SettingsPage() {
     formData.append("bio", bio);
     formData.append("city", city);
     formData.append("website", website);
+    formData.append("university_topic_id", resolveUniversityTopicId(isStudent, universityId) ?? "");
     if (avatarFile) formData.append("avatar", avatarFile);
     if (coverFile) formData.append("cover", coverFile);
 
@@ -223,6 +229,13 @@ export default function SettingsPage() {
                 onChange={(e) => setWebsite(e.target.value)}
               />
             </div>
+
+            <UniversityPicker
+              isStudent={isStudent}
+              onIsStudentChange={setIsStudent}
+              universityId={universityId}
+              onUniversityIdChange={setUniversityId}
+            />
 
             {error && <p className="field-error">{error}</p>}
             {saved && <p className="text-sm text-emerald-600">{dict.settings.saved}</p>}

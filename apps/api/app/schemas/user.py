@@ -30,6 +30,7 @@ class UserMe(UserPublic):
     email_verified: bool
     role: str
     totp_enabled: bool
+    university_topic_id: uuid.UUID | None = None
 
 
 class ProfileOut(UserPublic):
@@ -54,6 +55,7 @@ class SignupRequest(BaseModel):
     username: str
     email: EmailStr
     password: str
+    university_topic_id: uuid.UUID | None = None
 
     @field_validator("display_name")
     @classmethod

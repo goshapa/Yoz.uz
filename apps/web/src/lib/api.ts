@@ -83,6 +83,7 @@ export type UserMe = {
   is_founder: boolean;
   created_at: string;
   last_seen_at: string;
+  university_topic_id: string | null;
 };
 
 export type LoginResult = {
@@ -152,6 +153,13 @@ export type Topic = {
 export type TopicMembership = {
   members_count: number;
   is_member: boolean;
+};
+
+export type UniversityOption = {
+  id: string;
+  name_ru: string;
+  name_uz: string;
+  name_en: string;
 };
 
 export type SearchUser = {

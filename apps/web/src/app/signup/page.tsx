@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { AuthCard } from "@/components/AuthCard";
+import { resolveUniversityTopicId, UniversityPicker } from "@/components/UniversityPicker";
 import { api, ApiError } from "@/lib/api";
 import { useI18n } from "@/lib/i18n";
 
@@ -18,6 +19,8 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [agreed, setAgreed] = useState(false);
+  const [isStudent, setIsStudent] = useState(false);
+  const [universityId, setUniversityId] = useState("");
 
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -38,6 +41,7 @@ export default function SignupPage() {
         username,
         email,
         password,
+        university_topic_id: resolveUniversityTopicId(isStudent, universityId),
       });
       router.push(`/verify-email?email=${encodeURIComponent(email.trim())}`);
     } catch (err) {
@@ -123,6 +127,13 @@ export default function SignupPage() {
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
         </div>
+
+        <UniversityPicker
+          isStudent={isStudent}
+          onIsStudentChange={setIsStudent}
+          universityId={universityId}
+          onUniversityIdChange={setUniversityId}
+        />
 
         <label className="flex items-start gap-2 text-xs text-[var(--fg-muted)]">
           <input
