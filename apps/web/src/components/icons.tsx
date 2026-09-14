@@ -30,7 +30,10 @@ export type IconName =
   | "play"
   | "forward"
   | "users"
-  | "gamepad";
+  | "gamepad"
+  | "scissors"
+  | "hangman"
+  | "snake";
 
 const ICON_PATHS: Record<IconName, ReactNode> = {
   reply: (
@@ -185,6 +188,27 @@ const ICON_PATHS: Record<IconName, ReactNode> = {
       <circle cx="18" cy="11" r="1" />
       <rect x="2" y="6" width="20" height="12" rx="5" />
     </>
+  ),
+  scissors: (
+    <>
+      <circle cx="6" cy="6" r="3" />
+      <circle cx="6" cy="18" r="3" />
+      <line x1="20" y1="4" x2="8.12" y2="15.88" />
+      <line x1="14.47" y1="14.48" x2="20" y2="20" />
+      <line x1="8.12" y1="8.12" x2="12" y2="12" />
+    </>
+  ),
+  hangman: (
+    <>
+      <line x1="4" y1="21" x2="14" y2="21" />
+      <line x1="7" y1="21" x2="7" y2="3" />
+      <line x1="7" y1="4" x2="17" y2="4" />
+      <line x1="17" y1="4" x2="17" y2="8" />
+      <circle cx="17" cy="11" r="3" />
+    </>
+  ),
+  snake: (
+    <path d="M4 7c0-2 2-3 4-3s4 1.5 4 3-2 3-4 3-4 1.5-4 3 2 3 4 3h8c2 0 4-1.5 4-3s-1-3-3-3" />
   ),
 };
 

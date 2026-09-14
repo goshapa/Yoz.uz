@@ -212,6 +212,7 @@ const en: Dictionary = {
     draw: "Draw",
     youWin: "You win!",
     youLose: "You lose",
+    gameOver: "Game over",
     ticTacToe: {
       title: "Tic-Tac-Toe",
       description: "Play against the computer",
@@ -234,6 +235,28 @@ const en: Dictionary = {
       yourScore: "Your score",
       next: "Next",
       finish: "Finish",
+    },
+    hangman: {
+      title: "Hangman",
+      description: "Guess the word letter by letter",
+      attemptsLeft: "Attempts left",
+      wordWas: "The word was",
+    },
+    snake: {
+      title: "Snake",
+      description: "Eat and grow, don't hit the wall or yourself",
+      hint: "Arrow keys, swipe, or the buttons below",
+    },
+    rps: {
+      title: "Rock Paper Scissors",
+      description: "Play against the computer",
+      rock: "Rock",
+      paper: "Paper",
+      scissors: "Scissors",
+      wins: "Wins",
+      losses: "Losses",
+      draws: "Draws",
+      resetScore: "Reset score",
     },
   },
   settings: {

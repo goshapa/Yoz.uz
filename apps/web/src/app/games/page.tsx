@@ -12,6 +12,9 @@ const GAMES = [
   { slug: "tic-tac-toe", icon: "x" as const },
   { slug: "2048", icon: "gamepad" as const },
   { slug: "quiz", icon: "check" as const },
+  { slug: "hangman", icon: "hangman" as const },
+  { slug: "snake", icon: "snake" as const },
+  { slug: "rock-paper-scissors", icon: "scissors" as const },
 ];
 
 export default function GamesPage() {
@@ -29,6 +32,9 @@ export default function GamesPage() {
     "tic-tac-toe": dict.games.ticTacToe,
     "2048": dict.games.game2048,
     quiz: dict.games.quiz,
+    hangman: dict.games.hangman,
+    snake: dict.games.snake,
+    "rock-paper-scissors": dict.games.rps,
   };
 
   return (

@@ -212,6 +212,7 @@ const uz: Dictionary = {
     draw: "Durrang",
     youWin: "Siz yutdingiz!",
     youLose: "Siz yutqazdingiz",
+    gameOver: "O‘yin tugadi",
     ticTacToe: {
       title: "Krestiki-noliki",
       description: "Kompyuterga qarshi o‘ynang",
@@ -234,6 +235,28 @@ const uz: Dictionary = {
       yourScore: "Sizning natijangiz",
       next: "Keyingisi",
       finish: "Yakunlash",
+    },
+    hangman: {
+      title: "Osma o‘yin",
+      description: "So‘zni harflab toping",
+      attemptsLeft: "Qolgan urinishlar",
+      wordWas: "Yashirilgan so‘z",
+    },
+    snake: {
+      title: "Ilon",
+      description: "Ovqatni yeb o‘sing, devorga yoki o‘zingizga urilmang",
+      hint: "Klaviatura strelkalari, svayp yoki pastdagi tugmalar",
+    },
+    rps: {
+      title: "Tosh, qaychi, qog‘oz",
+      description: "Kompyuterga qarshi o‘ynang",
+      rock: "Tosh",
+      paper: "Qog‘oz",
+      scissors: "Qaychi",
+      wins: "G‘alabalar",
+      losses: "Mag‘lubiyatlar",
+      draws: "Durranglar",
+      resetScore: "Hisobni tozalash",
     },
   },
   settings: {
