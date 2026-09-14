@@ -429,6 +429,10 @@ const uz: Dictionary = {
           body: "Postlar sizning mulkingiz bo‘lib qoladi. Ularni joylashtirish orqali siz Yoz-ga ularni maxfiylik sozlamalariga muvofiq boshqa foydalanuvchilarga ko‘rsatish huquqini berasiz.",
         },
         {
+          heading: "Foydalanuvchi javobgarligi",
+          body: "Siz platformadagi o‘z harakatlaringiz, postlaringiz, xabarlaringiz va boshqa har qanday xatti-harakatlaringiz uchun, jumladan O‘zbekiston Respublikasi qonunchiligiga rioya qilish uchun shaxsan javobgarsiz. Yoz foydalanuvchilar o‘rtasidagi munosabatlarning tomoni emas va foydalanuvchilarning noqonuniy xatti-harakatlari, jumladan taqiqlangan moddalarni tarqatish, tahdid, zo‘ravonlik va qonunning boshqa buzilishlari uchun javobgar emas.",
+        },
+        {
           heading: "Cheklash va akkountni o‘chirish",
           body: "Qoidalar buzilganda akkount vaqtincha cheklanishi yoki bloklanishi mumkin. Sozlamalarda akkountni o‘zingiz o‘chirishingiz mumkin — bu postlar, obunalar va reaksiyalarni butunlay o‘chiradi.",
         },

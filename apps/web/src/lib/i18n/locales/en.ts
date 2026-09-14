@@ -429,6 +429,10 @@ const en: Dictionary = {
           body: "Your posts remain your property. By publishing them, you grant Yoz the right to display them to other users in accordance with your privacy settings.",
         },
         {
+          heading: "User responsibility",
+          body: "You are personally responsible for your own actions, posts, messages, and any other conduct on the platform, including compliance with the laws of the Republic of Uzbekistan. Yoz is not a party to interactions between users and is not liable for users' unlawful conduct, including the distribution of prohibited substances, threats, violence, or other violations of the law.",
+        },
+        {
           heading: "Suspension and deletion",
           body: "Accounts that violate the rules may be temporarily restricted or blocked. You can delete your account yourself in settings — this permanently removes your posts, follows and reactions.",
         },
