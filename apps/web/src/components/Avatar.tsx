@@ -39,7 +39,7 @@ export function Avatar({
         width={size}
         height={size}
         className="shrink-0 rounded-full object-cover"
-        style={{ width: size, height: size }}
+        style={{ width: size, height: size, aspectRatio: "1 / 1" }}
       />
     );
   }
@@ -47,7 +47,7 @@ export function Avatar({
   return (
     <div
       className={`flex shrink-0 items-center justify-center rounded-full font-semibold text-white shadow-sm ${pickColor(name || "?")}`}
-      style={{ width: size, height: size, fontSize: size * 0.4 }}
+      style={{ width: size, height: size, aspectRatio: "1 / 1", fontSize: size * 0.4 }}
       aria-hidden
     >
       {initial}
