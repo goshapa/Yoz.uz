@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
 import { FeedList } from "@/components/FeedList";
+import { NotificationBell } from "@/components/NotificationBell";
 import { SettingsMenu } from "@/components/SettingsMenu";
 import { SuggestedUsers } from "@/components/SuggestedUsers";
 import { api, type Post, type UserMe } from "@/lib/api";
@@ -41,6 +42,7 @@ export default function HomePage() {
           {/* Когда рядом есть кнопки входа, шестерёнка стоит левее и меню открывается вправо.
               Когда пользователь залогинен, шестерёнка одна прижата к правому краю экрана —
               там меню нужно открывать влево, иначе оно вылезает за пределы экрана. */}
+          <NotificationBell user={user} />
           <SettingsMenu align={checkedAuth && !user ? "left" : "right"} />
           {checkedAuth && !user && (
             <>
@@ -83,12 +85,6 @@ export default function HomePage() {
           className="flex-1 rounded-lg py-2 text-center text-sm font-bold text-[var(--fg-muted)] transition hover:bg-black/5 dark:hover:bg-white/5"
         >
           {dict.communities.title}
-        </Link>
-        <Link
-          href="/games"
-          className="flex-1 rounded-lg py-2 text-center text-sm font-bold text-[var(--fg-muted)] transition hover:bg-black/5 dark:hover:bg-white/5"
-        >
-          {dict.games.title}
         </Link>
       </nav>
 

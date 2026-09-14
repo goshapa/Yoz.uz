@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 import { AdminSidebar } from "@/components/AdminSidebar";
 import { Icon, type IconName } from "@/components/icons";
+import { NotificationBell } from "@/components/NotificationBell";
 import { PostComposer } from "@/components/PostComposer";
 import { SettingsMenu } from "@/components/SettingsMenu";
 import { api, type Post, type UserMe } from "@/lib/api";
@@ -25,7 +26,6 @@ export function AppShell({
   const { dict } = useI18n();
   const pathname = usePathname();
   const [composerOpen, setComposerOpen] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
   const [unreadMessages, setUnreadMessages] = useState(0);
 
   useEffect(() => {
@@ -33,12 +33,6 @@ export function AppShell({
 
     let cancelled = false;
     function poll() {
-      api
-        .get<{ count: number }>("/notifications/unread-count")
-        .then((res) => {
-          if (!cancelled) setUnreadCount(res.count);
-        })
-        .catch(() => undefined);
       api
         .get<{ count: number }>("/messages/unread-count")
         .then((res) => {
@@ -56,7 +50,6 @@ export function AppShell({
   }, [user]);
 
   useEffect(() => {
-    if (pathname === "/notifications") setUnreadCount(0);
     if (pathname.startsWith("/messages")) setUnreadMessages(0);
   }, [pathname]);
 
@@ -67,13 +60,25 @@ export function AppShell({
   // не полноэкранный чат, ей нижняя панель не мешает.
   const isConversationView = pathname.startsWith("/messages/") || /^\/groups\/[^/]+$/.test(pathname);
 
-  // Чат — по центру нижней панели на мобильном (индекс 2 из 5).
-  const navItems: { href: string; label: string; icon: IconName; badge?: number }[] = [
+  // Уведомления живут отдельной квадратной кнопкой рядом с шестерёнкой (см.
+  // NotificationBell), а не в этом списке — поэтому на десктопе их тут нет
+  // вовсе, а на мобильной нижней панели их место занимают Игры.
+  type NavItem = { href: string; label: string; icon: IconName; badge?: number };
+  const baseNavItems: NavItem[] = [
     { href: "/", label: dict.nav.home, icon: "home" },
     { href: "/search", label: dict.nav.search, icon: "search" },
     { href: "/messages", label: dict.nav.messages, icon: "message-circle", badge: unreadMessages },
-    { href: "/notifications", label: dict.nav.notifications, icon: "bell", badge: unreadCount },
-    { href: user ? `/u/${user.username}` : "/login", label: dict.nav.profile, icon: "user" },
+  ];
+  const profileItem: NavItem = {
+    href: user ? `/u/${user.username}` : "/login",
+    label: dict.nav.profile,
+    icon: "user",
+  };
+  const desktopNavItems: NavItem[] = [...baseNavItems, profileItem];
+  const mobileNavItems: NavItem[] = [
+    ...baseNavItems,
+    { href: "/games", label: dict.games.title, icon: "gamepad" },
+    profileItem,
   ];
 
   return (
@@ -90,10 +95,13 @@ export function AppShell({
               <span className="logo-mark h-8 w-8 text-base">Y</span>
               <span className="text-gradient text-2xl font-extrabold tracking-tight">{dict.common.appName}</span>
             </Link>
-            <SettingsMenu align="right" />
+            <div className="flex items-center gap-2">
+              <NotificationBell user={user} />
+              <SettingsMenu align="right" />
+            </div>
           </div>
           <nav className="flex flex-col gap-1">
-            {navItems.map((item) => (
+            {desktopNavItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -178,7 +186,7 @@ export function AppShell({
 
       {!isConversationView && (
         <nav className="fixed inset-x-0 bottom-0 z-20 flex border-t border-[var(--border)] bg-[var(--bg-elevated)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] md:hidden">
-          {navItems.map((item) => (
+          {mobileNavItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
