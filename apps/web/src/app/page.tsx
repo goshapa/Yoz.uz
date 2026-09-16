@@ -13,19 +13,47 @@ import { useI18n } from "@/lib/i18n";
 
 type Tab = "following" | "overview";
 
+// Запоминаем выбранную вкладку в sessionStorage: без этого возврат с /post/[id]
+// (кнопка "назад") каждый раз пересоздаёт HomePage с нуля и сбрасывает на
+// "Подписки" — раздражает, если листал именно "Рекомендации".
+const TAB_STORAGE_KEY = "yoz-home-tab";
+
+function readStoredTab(): Tab | null {
+  try {
+    const raw = window.sessionStorage.getItem(TAB_STORAGE_KEY);
+    return raw === "following" || raw === "overview" ? raw : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function HomePage() {
   const { dict } = useI18n();
-  const [tab, setTab] = useState<Tab>("overview");
+  // Стартуем с "overview" и на сервере, и при первом клиентском рендере (иначе
+  // чтение sessionStorage до гидратации даёт разный HTML на сервере и клиенте —
+  // React ругается на hydration mismatch), а реальное значение подставляем
+  // в эффекте ниже, уже после монтирования.
+  const [tab, setTabState] = useState<Tab>("overview");
   const [user, setUser] = useState<UserMe | null>(null);
   const [checkedAuth, setCheckedAuth] = useState(false);
   const [injectedPost, setInjectedPost] = useState<Post | null>(null);
 
+  function setTab(next: Tab) {
+    setTabState(next);
+    try {
+      window.sessionStorage.setItem(TAB_STORAGE_KEY, next);
+    } catch {
+      // localStorage/sessionStorage может быть недоступен — не критично.
+    }
+  }
+
   useEffect(() => {
+    const stored = readStoredTab();
     api
       .get<UserMe>("/users/me")
       .then((u) => {
         setUser(u);
-        setTab("following");
+        setTabState(stored ?? "following");
       })
       .catch(() => setUser(null))
       .finally(() => setCheckedAuth(true));
