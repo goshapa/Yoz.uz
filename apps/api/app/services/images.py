@@ -60,6 +60,9 @@ def _encode(image: Image.Image, fmt: str, max_dimension: int) -> tuple[bytes, in
 
 
 def _process_bytes(raw: bytes) -> ProcessedImage:
+    corrupted = HTTPException(
+        status.HTTP_400_BAD_REQUEST, detail="Файл повреждён или не является изображением"
+    )
     try:
         probe = Image.open(io.BytesIO(raw))
         probe.verify()
@@ -67,9 +70,14 @@ def _process_bytes(raw: bytes) -> ProcessedImage:
         image = Image.open(io.BytesIO(raw))
         image.load()
     except Exception as exc:
-        raise HTTPException(
-            status.HTTP_400_BAD_REQUEST, detail="Файл повреждён или не является изображением"
-        ) from exc
+        raise corrupted from exc
+
+    # verify()/load() пропускают файлы, где Pillow смог разобрать заголовок, но
+    # получил нулевую ширину/высоту (битая докачка с телефона и т.п.) — сам по
+    # себе такой файл не считается "повреждённым" для verify(), но Image.thumbnail()
+    # внутри Pillow делает width / height и падает ZeroDivisionError без этой проверки.
+    if image.width <= 0 or image.height <= 0:
+        raise corrupted
 
     actual_format = image.format
     if actual_format in _FORMAT_INFO:
@@ -80,10 +88,17 @@ def _process_bytes(raw: bytes) -> ProcessedImage:
         info = _FALLBACK_PNG if has_alpha else _FALLBACK_JPEG
         target_format = "PNG" if has_alpha else "JPEG"
 
-    full_bytes, width, height = _encode(image, target_format, MAX_DIMENSION)
+    try:
+        full_bytes, width, height = _encode(image, target_format, MAX_DIMENSION)
 
-    thumb_source = Image.open(io.BytesIO(raw))
-    thumb_bytes, _, _ = _encode(thumb_source, target_format, THUMBNAIL_MAX_DIMENSION)
+        thumb_source = Image.open(io.BytesIO(raw))
+        thumb_bytes, _, _ = _encode(thumb_source, target_format, THUMBNAIL_MAX_DIMENSION)
+    except HTTPException:
+        raise
+    except Exception as exc:
+        # Подстраховка от любых других внутренних сбоев Pillow при кодировании —
+        # пользователь должен получить понятную ошибку, а не 500.
+        raise corrupted from exc
 
     return ProcessedImage(
         original_bytes=full_bytes,
