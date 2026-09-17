@@ -24,7 +24,21 @@ services:
     ports: !reset []
 
   api:
-    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    # --proxy-headers + --forwarded-allow-ips="*" — доверяем X-Forwarded-For от
+    # Caddy, иначе request.client.host у всех запросов одинаковый (внутренний IP
+    # Caddy в docker-сети), и rate limiter (app/services/rate_limit.py, ключ по IP)
+    # превращается в один общий счётчик на весь сайт вместо счётчика на посетителя.
+    command:
+      [
+        "uvicorn",
+        "app.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000",
+        "--proxy-headers",
+        "--forwarded-allow-ips=*",
+      ]
     volumes: !reset []
     ports: !reset []
 
