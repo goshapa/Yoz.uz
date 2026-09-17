@@ -3,6 +3,17 @@ yozapp.uz {
 	# поэтому можно безопасно закрепить HTTPS-only на год (с поддоменами).
 	header Strict-Transport-Security "max-age=31536000; includeSubDomains"
 
+	# Базовые защитные заголовки — не ломают приложение, но закрывают целый класс
+	# типовых атак (clickjacking, MIME-sniffing, утечка адресов через Referer,
+	# доступ сторонних скриптов к камере/микрофону/геолокации, которые Yoz не использует).
+	header X-Content-Type-Options "nosniff"
+	header X-Frame-Options "DENY"
+	header Referrer-Policy "strict-origin-when-cross-origin"
+	header Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+	# Скрываем, что за сервер отвечает — не защита сама по себе, но не даём
+	# бесплатную подсказку для разведки перед атакой.
+	header -Server
+
 	# Сжатие ответов — без этого JS/CSS/HTML/JSON уходят клиенту полным весом.
 	# zstd эффективнее и быстрее gzip там, где браузер его поддерживает, gzip —
 	# универсальный фолбэк. Картинки (/yoz-media/*) уже сжаты как JPEG/WebP,
