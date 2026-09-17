@@ -251,7 +251,7 @@ export default function GroupSettingsPage() {
                     key={u.id}
                     type="button"
                     onClick={() => handleAddMember(u)}
-                    className="card mt-2 flex w-full items-center gap-3 px-3 py-2 text-left hover:-translate-y-0.5 hover:shadow-lg hover:shadow-accent-500/[0.06]"
+                    className="card mt-2 flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-black/[0.02] dark:hover:bg-white/[0.03]"
                   >
                     <Avatar src={u.avatar_url} name={u.display_name} size={32} />
                     <div className="min-w-0 flex-1">

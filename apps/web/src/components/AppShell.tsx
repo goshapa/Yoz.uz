@@ -87,11 +87,6 @@ export function AppShell({
 
   return (
     <div className="relative mx-auto flex min-h-screen w-full max-w-5xl">
-      <div className="bg-mesh">
-        <div className="absolute -left-40 -top-40 h-80 w-80 rounded-full bg-accent-500/[0.07] blur-2xl" />
-        <div className="absolute -right-40 top-1/3 h-80 w-80 rounded-full bg-sun-500/[0.05] blur-2xl" />
-      </div>
-
       <aside className="sticky top-0 hidden h-screen w-56 shrink-0 flex-col px-3 py-4 md:flex">
         <div>
           <div className="mb-6 flex items-center justify-between px-2">

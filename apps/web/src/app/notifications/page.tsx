@@ -117,7 +117,7 @@ export default function NotificationsPage() {
                 key={n.id}
                 href={hrefFor(n)}
                 onClick={() => handleClick(n)}
-                className={`card mx-3 my-2 flex items-start gap-3 px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-accent-500/[0.06] ${
+                className={`card mx-3 my-2 flex items-start gap-3 px-4 py-3 transition hover:bg-black/[0.02] dark:hover:bg-white/[0.03] ${
                   n.read_at ? "" : "ring-1 ring-accent-500/30"
                 }`}
               >

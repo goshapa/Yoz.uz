@@ -133,7 +133,7 @@ export function PostCard({
   }
 
   return (
-    <article className="card mx-3 my-2.5 px-4 py-3.5 transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-accent-500/[0.06]">
+    <article className="card mx-3 my-2.5 px-4 py-3.5 transition hover:bg-black/[0.02] dark:hover:bg-white/[0.03]">
       {state.reposted_by && (
         <p className="mb-1 flex items-center gap-1 pl-8 text-xs text-[var(--fg-muted)]">
           <span>🔁</span>

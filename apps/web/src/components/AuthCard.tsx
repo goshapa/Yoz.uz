@@ -16,13 +16,8 @@ export function AuthCard({
   const { dict } = useI18n();
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-10">
-      <div
-        className="pointer-events-none absolute -top-32 left-1/2 h-64 w-[30rem] -translate-x-1/2 rounded-full bg-accent-500/[0.06] blur-2xl"
-        aria-hidden
-      />
-
-      <div className="relative mb-6 flex w-full max-w-sm items-center justify-between">
+    <div className="flex min-h-screen flex-col items-center justify-center px-4 py-10">
+      <div className="mb-6 flex w-full max-w-sm items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
           <span className="logo-mark h-8 w-8 text-base">Y</span>
           <span className="text-gradient text-2xl font-extrabold tracking-tight">{dict.common.appName}</span>

@@ -134,7 +134,7 @@ export default function SearchPage() {
                 <Link
                   key={u.id}
                   href={`/u/${u.username}`}
-                  className="card mx-3 my-2 flex items-center gap-3 px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-accent-500/[0.06]"
+                  className="card mx-3 my-2 flex items-center gap-3 px-4 py-3 transition hover:bg-black/[0.02] dark:hover:bg-white/[0.03]"
                 >
                   <Avatar src={u.avatar_url} name={u.display_name} />
                   <div className="min-w-0">

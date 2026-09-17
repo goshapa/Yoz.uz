@@ -154,7 +154,7 @@ export default function MessagesPage() {
               <Link
                 key={u.id}
                 href={`/messages/${u.username}`}
-                className="card mx-3 my-2 flex items-center gap-3 px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-accent-500/[0.06]"
+                className="card mx-3 my-2 flex items-center gap-3 px-4 py-3 transition hover:bg-black/[0.02] dark:hover:bg-white/[0.03]"
               >
                 <Avatar src={u.avatar_url} name={u.display_name} />
                 <div className="min-w-0">
@@ -181,7 +181,7 @@ export default function MessagesPage() {
               <Link
                 key={item.key}
                 href={`/messages/${item.data.peer.username}`}
-                className="card mx-3 my-2 flex items-start gap-3 px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-accent-500/[0.06]"
+                className="card mx-3 my-2 flex items-start gap-3 px-4 py-3 transition hover:bg-black/[0.02] dark:hover:bg-white/[0.03]"
               >
                 <Avatar src={item.data.peer.avatar_url} name={item.data.peer.display_name} size={44} />
                 <div className="min-w-0 flex-1">
@@ -216,7 +216,7 @@ export default function MessagesPage() {
               <Link
                 key={item.key}
                 href={`/groups/${item.data.id}`}
-                className="card mx-3 my-2 flex items-start gap-3 px-4 py-3 transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-accent-500/[0.06]"
+                className="card mx-3 my-2 flex items-start gap-3 px-4 py-3 transition hover:bg-black/[0.02] dark:hover:bg-white/[0.03]"
               >
                 <Avatar src={item.data.avatar_url} name={item.data.title} size={44} />
                 <div className="min-w-0 flex-1">

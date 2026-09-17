@@ -46,7 +46,7 @@ body.body-scroll-locked {
 
 @layer components {
   .card {
-    @apply bg-[var(--bg-elevated)] border-[1.5px] border-[var(--border)] rounded-xl shadow-lg shadow-black/[0.08] dark:shadow-black/50;
+    @apply bg-[var(--bg-elevated)] border-[1.5px] border-[var(--border)] rounded-xl;
   }
 
   /* text-base (16px) на мобильном — иначе iOS Safari сам зумит страницу при фокусе
@@ -56,7 +56,7 @@ body.body-scroll-locked {
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded-lg bg-accent-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-accent-900/25 transition hover:bg-accent-700 hover:shadow-xl hover:shadow-accent-900/30 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-accent-500/50 active:bg-accent-800 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none disabled:hover:translate-y-0;
+    @apply inline-flex items-center justify-center rounded-lg bg-accent-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-accent-700 focus:outline-none focus:ring-2 focus:ring-accent-500/50 active:bg-accent-800 disabled:cursor-not-allowed disabled:opacity-60;
   }
 
   .btn-secondary {
@@ -65,7 +65,7 @@ body.body-scroll-locked {
 
   /* Компактные варианты для тесных мест: мобильный хедер, панель админа, инлайн-кнопки в карточках. */
   .btn-primary-sm {
-    @apply inline-flex items-center justify-center rounded-lg bg-accent-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm shadow-accent-900/25 transition hover:bg-accent-700 disabled:cursor-not-allowed disabled:opacity-60;
+    @apply inline-flex items-center justify-center rounded-lg bg-accent-600 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-accent-700 disabled:cursor-not-allowed disabled:opacity-60;
   }
 
   .btn-secondary-sm {
@@ -85,10 +85,6 @@ body.body-scroll-locked {
   }
 
   .logo-mark {
-    @apply flex items-center justify-center rounded-lg bg-accent-600 font-black text-white shadow-md shadow-accent-900/40;
-  }
-
-  .bg-mesh {
-    @apply pointer-events-none fixed inset-0 -z-10 overflow-hidden;
+    @apply flex items-center justify-center rounded-lg bg-accent-600 font-black text-white;
   }
 }
