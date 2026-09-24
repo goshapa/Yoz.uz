@@ -63,9 +63,10 @@ async def overview_feed(
     if topic is not None:
         query = query.where(Post.topic_id == topic)
     else:
-        # Без фильтра по теме это общая лента "Все темы"/рекомендации — посты,
-        # помеченные как объявления конкретного сообщества, туда не подмешиваем.
-        query = query.where(Post.community_only.is_(False))
+        # Без фильтра по теме это общая лента "Все темы"/рекомендации — любой
+        # пост, привязанный к сообществу, туда не подмешиваем (он живёт только
+        # в своей ленте сообщества), а не только помеченные community_only.
+        query = query.where(Post.topic_id.is_(None))
     if city:
         query = query.where(Post.city.ilike(city))
 
